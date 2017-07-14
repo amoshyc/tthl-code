@@ -6,7 +6,7 @@ import numpy as np
 from util import read_img
 
 
-def image_generator(video_dirs, n_samples, batch_size):
+def image_generator(video_dirs, batch_size):
     # Get all paths
     x_all = []
     y_all = []
@@ -16,7 +16,7 @@ def image_generator(video_dirs, n_samples, batch_size):
         x_all.extend(imgs)
         y_all.extend(label)
 
-    indices = np.random.permutation(len(x_all))[:n_samples]
+    indices = np.random.permutation(len(x_all))
     x_use = [x_all[i] for i in indices]
     y_use = [y_all[i] for i in indices]
 
@@ -33,7 +33,7 @@ def image_generator(video_dirs, n_samples, batch_size):
                 yield (x_batch, y_batch)
 
 
-def window_generator(video_dirs, n_samples, batch_size, timesteps):
+def window_generator(video_dirs, batch_size, timesteps):
     x_batch = np.zeros((batch_size, timesteps, 224, 224, 3), dtype=np.float32)
     y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
@@ -58,7 +58,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
                 idx = (idx + 1) % batch_size
 
 
-def window_npy_generator(video_dirs, n_samples, batch_size, timesteps):
+def window_npy_generator(video_dirs, batch_size, timesteps):
     x_batch = np.zeros((batch_size, timesteps, 224, 224, 3), dtype=np.float32)
     y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
@@ -71,7 +71,7 @@ def window_npy_generator(video_dirs, n_samples, batch_size, timesteps):
             # [i, i + timesteps)
             windows = [(i, i + timesteps)
                        for i in range(len(xs) - timesteps + 1)]
-            random.shuffle(windows)[:samples]
+            random.shuffle(windows)
 
             for (s, e) in windows:
                 for f in range(s, e):
