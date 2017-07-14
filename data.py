@@ -20,7 +20,7 @@ def gen_image_npy(video_dirs, target_dir, n_samples):
     for idx, x_part, y_part in split(x_use, y_use, k=5000):
         n = len(x_part)
         xs = np.zeros((n, 224, 224, 3), dtype=np.float32)
-        ys = np.zerso((n, 1), dtype=np.uint8)
+        ys = np.zeros((n, 1), dtype=np.uint8)
         for i in range(n):
             xs[i] = read_img(x_part[i])
             ys[i] = y_part[i]
@@ -44,7 +44,7 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
     for idx, x_part, y_part in split(x_use, y_use, k=5000):
         n = len(x_part)
         xs = np.zeros((n, timesteps, 224, 224, 3), dtype=np.float32)
-        ys = np.array((n, 1), dtype=np.uint8)
+        ys = np.zeros((n, 1), dtype=np.uint8)
         for i in range(n):
             (video_dir, s, e) = x_part[i]
             for f in range(s, e):
