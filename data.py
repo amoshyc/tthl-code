@@ -38,7 +38,7 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
         labels = read_json(video_dir / 'label.json')['label']
         windows = [(video_dir, i, i + timesteps) for i in range(n_frames - timesteps + 1)]
         x_all.extend(windows)
-        y_all.extend([labels[e - 1] for (s, e) in windows])
+        y_all.extend([labels[e - 1] for (_, s, e) in windows])
 
     x_use, y_use = sample(x_all, y_all, k=n_samples)
 
