@@ -57,6 +57,23 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
         np.save(str(target_dir / 'y_{:05d}.npy'.format(idx)), ys)
         del xs, ys
 
+def image_generator(npy_dir, batch_size):
+    x_paths = sorted(npy_dir.glob('x_*.npy'))
+    y_paths = sorted(npy_dir.glob('y_*.npy'))
+
+    idx = 0
+    x_batch = np.zeros((batch_size, 224, 224, 3), dtype=np.float32)
+    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
+
+    while True:
+        for x_part, y_part in zip(x_paths, y_paths):
+            for x, y in zip(x_part, y_part):
+                x_batch[idx] = x
+                y_batch[idx] = y
+                if idx + 1 == batch_size:
+                    yield x_batch, y_batch
+                idx = (idx + 1) % batch_size
+
 if __name__ == '__main__':
     dataset = Path('~/dataset/').expanduser()
     # gen_image_npy([dataset / 'video00'], Path('npy/image_train'), 25000)
