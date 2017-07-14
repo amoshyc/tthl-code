@@ -15,7 +15,7 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-from img_data import train_gen, val_gen
+from img_data import generator
 from utils import get_callbacks
 
 
