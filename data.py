@@ -45,18 +45,23 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
             xs = sorted((video_dir / 'frames/').iterdir())
             ys = json.load((video_dir / 'label.json').open())['label']
 
+            for i, path in enumerate(xs):
+                xs[i] = read_img(path)
+
             # [i, i + timesteps)
             windows = [(i, i + timesteps) for i in range(len(xs) - timesteps + 1)]
-            # random.shuffle(windows)
+            random.shuffle(windows)
 
             for (s, e) in windows:
                 for f in range(s, e):
-                    x_batch[idx][f - s] = read_img(xs[f])
+                    x_batch[idx][f - s] = xs[f]
                 y_batch[idx] = ys[e - 1]
 
                 if idx == batch_size - 1:
                     yield x_batch, y_batch
                 idx = (idx + 1) % batch_size
+
+            xs = None
 
 
 
