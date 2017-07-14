@@ -43,12 +43,10 @@ def main():
     n_val = 5000
     batch_size = 40
 
-    dataset = Path('~/dataset/').expanduser().resolve()
-    video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
-    train_dirs = [(dataset / 'video01/')]
-    val_dirs = [(dataset / 'video00')]
-    train_gen = image_generator(train_dirs, batch_size)
-    val_gen = image_generator(val_dirs, batch_size)
+    train_npy_dir = Path('npy/image_train')
+    val_npy_dir = Path('npy/iamge_val')
+    train_gen = image_generator(train_npy_dir, batch_size)
+    val_gen = image_generator(val_npy_dir, batch_size)
 
     fit_arg = {
         'generator': train_gen,
