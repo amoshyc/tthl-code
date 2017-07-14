@@ -24,7 +24,7 @@ def sample(x, y, k=None):
 
 def split(x, y, k=None):
     n, idx = len(x), 0
-    for i in range(n, k):
+    for i in range(0, n, k):
         s, e = i, min(i + k, n)
         yield idx, x[s:e], y[s:e]
         idx += 1

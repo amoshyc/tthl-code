@@ -9,7 +9,7 @@ from utils import read_img, sample, split
 def gen_image_npy(video_dirs, target_dir, n_samples):
     x_all = []
     y_all = []
-    for video_dir in tqdm(video_dirs):
+    for video_dir in video_dirs:
         imgs = sorted((video_dir / 'frames/').iterdir())
         label = json.load((video_dir / 'label.json').open())['label']
         x_all.extend(imgs)
