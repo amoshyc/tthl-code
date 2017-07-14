@@ -102,3 +102,4 @@ ENV/
 
 # this repo
 nohup.out
+npy/
