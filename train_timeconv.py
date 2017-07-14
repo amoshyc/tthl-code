@@ -62,7 +62,7 @@ def main():
         'callbacks': get_callbacks('timeconv')
     }
 
-    # model.fit_generator(**fit_arg)
+    model.fit_generator(**fit_arg)
 
 
 if __name__ == '__main__':
