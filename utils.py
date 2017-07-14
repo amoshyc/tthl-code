@@ -1,8 +1,11 @@
+import json
 from datetime import datetime
 import numpy as np
 from keras.preprocessing import image
 from keras.callbacks import Callback, ModelCheckpoint, CSVLogger
 
+def read_json(path):
+    return json.load(path.open())
 
 def read_img(path, target_size=(224, 224)):
     pil = image.load_img(str(path), target_size=target_size)

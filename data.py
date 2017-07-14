@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 from tqdm import tqdm
-from utils import read_img, sample, split
+from utils import *
 
 def gen_image_npy(video_dirs, target_dir, n_samples):
     x_all = []
