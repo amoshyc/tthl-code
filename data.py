@@ -51,7 +51,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
 
             for (s, e) in windows:
                 for f in range(s, e):
-                    x_batch[idx][f] = read_img(xs[f])
+                    x_batch[idx][f - s] = read_img(xs[f])
                 y_batch[idx] = ys[e - 1]
 
                 if idx == batch_size - 1:
