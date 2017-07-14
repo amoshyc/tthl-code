@@ -15,7 +15,7 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-from img_data import generator
+from data import image_generator
 from utils import get_callbacks
 
 
@@ -47,8 +47,8 @@ def main():
     video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
     train_dirs = [(dataset / 'video01/')]
     val_dirs = [(dataset / 'video00')]
-    train_gen = generator(train_dirs, n_train, batch_size)
-    val_gen = generator(val_dirs, n_val, batch_size)
+    train_gen = image_generator(train_dirs, n_train, batch_size)
+    val_gen = image_generator(val_dirs, n_val, batch_size)
 
     fit_arg = {
         'generator': train_gen,
