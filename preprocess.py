@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import numpy as np
 from tqdm import tqdm
 from moviepy.editor import VideoFileClip, concatenate_videoclips  # requires ffmpeg
 
