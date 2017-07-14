@@ -76,7 +76,7 @@ def image_generator(npy_dir, batch_size):
 
 if __name__ == '__main__':
     dataset = Path('~/dataset/').expanduser()
-    # gen_image_npy([dataset / 'video00'], Path('npy/image_train'), 25000)
+    gen_image_npy([dataset / 'video00'], Path('npy/image_train'), 25000)
     gen_image_npy([dataset / 'video01'], Path('npy/image_val'), 5000)
 
 
