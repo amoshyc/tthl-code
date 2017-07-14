@@ -59,8 +59,8 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
 
 if __name__ == '__main__':
     dataset = Path('~/dataset/').expanduser()
-    gen_image_npy([dataset / 'video00'], Path('npy/image_train'), 25000)
-    gen_image_npy([dataset / 'vidoe01'], Path('npy/image_val'), 5000)
+    # gen_image_npy([dataset / 'video00'], Path('npy/image_train'), 25000)
+    gen_image_npy([dataset / 'video01'], Path('npy/image_val'), 5000)
 
 
 # def image_generator(video_dirs, batch_size):
