@@ -66,7 +66,9 @@ def image_generator(npy_dir, batch_size):
     y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
     while True:
-        for x_part, y_part in zip(x_paths, y_paths):
+        for x_path, y_path in zip(x_paths, y_paths):
+            x_part = np.load(x_path)
+            y_part = np.load(y_path)
             for x, y in zip(x_part, y_part):
                 x_batch[idx] = x
                 y_batch[idx] = y
