@@ -27,6 +27,6 @@ def split(x, y, k=None):
     res = []
     for i in range(0, n, k):
         s, e = i, min(i + k, n)
-        res.append(idx, x[s:e], y[s:e])
+        res.append(tuple(idx, x[s:e], y[s:e]))
         idx += 1
     return res
