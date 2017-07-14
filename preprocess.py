@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import tqdm
 from moviepy.editor import VideoFileClip, concatenate_videoclips  # requires ffmpeg
 
+from utils import read_img
 
 def process(video_dir,
             gen_frames=False,
