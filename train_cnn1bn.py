@@ -43,6 +43,13 @@ def main():
     n_val = 5000
     batch_size = 40
 
+    dataset = Path('~/dataset/').expanduser().resolve()
+    video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
+    train_dirs = [(dataset / 'video01/')]
+    val_dirs = [(dataset / 'video00')]
+    train_gen = generator(train_dirs, n_train, batch_size)
+    val_gen = generator(val_dirs, n_val, batch_size)
+
     fit_arg = {
         'generator': train_gen,
         'steps_per_epoch': n_train // batch_size,

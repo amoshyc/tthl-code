@@ -31,10 +31,3 @@ def generator(video_dirs, n_samples, batch_size):
 
             if idx == batch_size - 1:
                 yield (x_batch, y_batch)
-
-dataset = Path('~/dataset/').expanduser().resolve()
-video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
-train_dirs = [(dataset / 'video01/')]
-val_dirs = [(dataset / 'video00')]
-train_gen = generator(train_dirs, n_train, batch_size)
-val_gen = generator(val_dirs, n_val, batch_size)
