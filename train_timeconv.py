@@ -39,27 +39,27 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    # n_train = 25000
-    # n_val = 5000
-    # batch_size = 40
+    n_train = 25000
+    n_val = 5000
+    batch_size = 40
 
-    # dataset = Path('~/dataset/').expanduser().resolve()
-    # video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
-    # train_dirs = [(dataset / 'video01/')]
-    # val_dirs = [(dataset / 'video00')]
-    # train_gen = image_generator(train_dirs, n_train, batch_size)
-    # val_gen = image_generator(val_dirs, n_val, batch_size)
+    dataset = Path('~/dataset/').expanduser().resolve()
+    video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
+    train_dirs = [(dataset / 'video01/')]
+    val_dirs = [(dataset / 'video00')]
+    train_gen = image_generator(train_dirs, n_train, batch_size)
+    val_gen = image_generator(val_dirs, n_val, batch_size)
 
-    # fit_arg = {
-    #     'generator': train_gen,
-    #     'steps_per_epoch': n_train // batch_size,
-    #     'epochs': 30,
-    #     'validation_data': val_gen,
-    #     'validation_steps': n_val // batch_size,
-    #     'callbacks': get_callbacks('convlstm')
-    # }
+    fit_arg = {
+        'generator': train_gen,
+        'steps_per_epoch': n_train // batch_size,
+        'epochs': 30,
+        'validation_data': val_gen,
+        'validation_steps': n_val // batch_size,
+        'callbacks': get_callbacks('convlstm')
+    }
 
-    # model.fit_generator(**fit_arg)
+    model.fit_generator(**fit_arg)
 
 
 if __name__ == '__main__':
