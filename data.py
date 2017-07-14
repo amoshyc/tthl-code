@@ -18,7 +18,7 @@ def gen_image_npy(video_dirs, target_dir, n_samples):
     x_use, y_use = sample(x_all, y_all, k=n_samples)
 
     parts = split(x_use, y_use, k=1000)
-    for (idx, x_part, y_part) in tqdm(parts):
+    for idx, x_part, y_part in tqdm(parts):
         n = len(x_part)
         xs = np.zeros((n, 224, 224, 3), dtype=np.float32)
         ys = np.zeros((n, 1), dtype=np.uint8)
@@ -42,7 +42,8 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
 
     x_use, y_use = sample(x_all, y_all, k=n_samples)
 
-    for idx, x_part, y_part in split(x_use, y_use, k=1000):
+    parts = split(x_use, y_use, k=200)
+    for idx, x_part, y_part in tqdm(parts):
         n = len(x_part)
         xs = np.zeros((n, timesteps, 224, 224, 3), dtype=np.float32)
         ys = np.zeros((n, 1), dtype=np.uint8)
@@ -58,9 +59,6 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
         del xs, ys
 
 def image_generator(npy_dir, batch_size):
-    if not npy_dir.exists():
-        print(npy_dir, 'not exist')
-
     x_paths = sorted(npy_dir.glob('x_*.npy'))
     y_paths = sorted(npy_dir.glob('y_*.npy'))
 
@@ -79,10 +77,43 @@ def image_generator(npy_dir, batch_size):
                     yield x_batch, y_batch
                 idx = (idx + 1) % batch_size
 
+
+def window_generator(npy_dir, batch_size):
+    x_paths = sorted(npy_dir.glob('x_*.npy'))
+    y_paths = sorted(npy_dir.glob('y_*.npy'))
+
+    idx, timesteps = 0, 30
+    x_batch = np.zeros((batch_size, timesteps, 224, 224, 3), dtype=np.float32)
+    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
+
+    while True:
+        for x_path, y_path in zip(x_paths, y_paths):
+            x_part = np.load(x_path)
+            y_part = np.load(y_path)
+            for x, y in zip(x_part, y_part):
+                x_batch[idx] = x
+                y_batch[idx] = y
+                if idx + 1 == batch_size:
+                    yield x_batch, y_batch
+                idx = (idx + 1) % batch_size
+    
+
 if __name__ == '__main__':
     dataset = Path('~/dataset/').expanduser()
-    gen_image_npy([dataset / 'video00'], Path('npy/image_train'), 25000)
-    gen_image_npy([dataset / 'video01'], Path('npy/image_val'), 5000)
+
+    image_train = Path('npy/image_train')
+    image_val = Path('npy/image_val')
+    window_train = Path('npy/window_train')
+    window_val = Path('npy/window_val')
+
+    for folder in [image_train, image_val, window_train, window_val]:
+        folder.mkdir(parents=True, exist_ok=True)
+
+    # gen_image_npy([dataset / 'video01'], image_val, 5000)
+    # gen_image_npy([dataset / 'video00'], image_train, 25000)
+    gen_window_npy([dataset / 'video00'], window_train, 2500)
+    # gen_window_npy([dataset / 'video01'], window_val, 5000)
+
 
 
 # def image_generator(video_dirs, batch_size):
