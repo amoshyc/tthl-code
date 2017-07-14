@@ -1,9 +1,14 @@
 import json
 from pathlib import Path
+from tqdm import tqdm
 from moviepy.editor import VideoFileClip, concatenate_videoclips  # requires ffmpeg
 
 
-def process(video_dir, gen_frames=True, gen_highlight=True, gen_label=True):
+def process(video_dir,
+            gen_frames=False,
+            gen_highlight=False,
+            gen_label=False,
+            gen_npy=False):
     """Generating frames, highlights and labels of the video.
     Frames is written as `video_dir/%08d.jpg`
     Highlight is generated as `highlight.mp4`
@@ -12,8 +17,8 @@ def process(video_dir, gen_frames=True, gen_highlight=True, gen_label=True):
     Arguments:
     video_dir:  A pathlib.Path object pointing to the folder of the target video. 
                 The directory should contain `video.mp4` and `info.json`.
-    gen_frames, gen_highlight,  gen_label: 
-                Controls whether to generate frames, highlight, label repectively.
+    gen_frames, gen_highlight,  gen_label, gen_npy: 
+                Controls whether to generate frames, highlight, label, npy repectively.
                 Default to True
     """
 
@@ -53,14 +58,28 @@ def process(video_dir, gen_frames=True, gen_highlight=True, gen_label=True):
             json.dump(label, f, ensure_ascii=False)
         print('ok')
 
+    if gen_npy:
+        print('Generating npy')
+        imgs = sorted((video_dir / 'frames/').iterdir())
+        xs = np.zeros((len(imgs), 224, 224, 3), dtype=np.float32)
+
+        print('Loading')
+        for img in tqdm(imgs):
+            xs[i] = read_img(img)
+
+        print('Saving...', end='')
+        np.save(str(video_dir / 'imgs.npy'), xs)
+        print('ok')
+
+        xs = None
+
 
 def process_all():
     dataset_dir = Path('~/dataset').expanduser().resolve()
     video_dirs = [x for x in dataset_dir.iterdir() if x.is_dir()]
     for i, video_dir in enumerate(video_dirs):
         print(video_dir, '({}/{})'.format(i + 1, len(video_dirs)))
-        process(
-            video_dir, gen_frames=False, gen_highlight=False, gen_label=True)
+        process(video_dir, gen_npy=True)
         print('*' * 50)
 
 
