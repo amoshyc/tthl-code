@@ -50,8 +50,8 @@ def main():
     video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
     train_dirs = [(dataset / 'video01/')]
     val_dirs = [(dataset / 'video00')]
-    train_gen = window_generator(train_dirs, n_train, batch_size, timesteps)
-    val_gen = window_generator(val_dirs, n_val, batch_size, timesteps)
+    train_gen = window_npy_generator(train_dirs, n_train, batch_size, timesteps)
+    val_gen = window_npy_generator(val_dirs, n_val, batch_size, timesteps)
 
     fit_arg = {
         'generator': train_gen,
