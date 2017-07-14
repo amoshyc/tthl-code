@@ -50,7 +50,7 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
         for i in range(n):
             (video_dir, s, e) = x_part[i]
             for f in range(s, e):
-                path = video_dir / 'frames' / '{:08d}'.format(f)
+                path = video_dir / 'frames' / '{:08d}.jpg'.format(f)
                 xs[i][f - s] = read_img(path)
             ys[i] = y_part[i]
 
