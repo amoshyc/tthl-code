@@ -66,7 +66,7 @@ def process(video_dir,
         xs = np.zeros((len(imgs), 224, 224, 3), dtype=np.float32)
 
         print('Loading')
-        for img in tqdm(imgs):
+        for i, img in enumerate(tqdm(imgs)):
             xs[i] = read_img(img)
 
         print('Saving...', end='')
