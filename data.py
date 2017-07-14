@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 from tqdm import tqdm
-from util import read_img, sample
+from utils import read_img, sample
 
 def gen_image_npy(video_dirs, target_dir, n_samples):
     x_all = []
@@ -58,7 +58,7 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
 
 if __name__ == '__main__':
     dataset = Path('~/dataset/').expanduser()
-    gen_image_npy([dataset / 'video00'], Path('npy/image_train'))
+    gen_image_npy([dataset / 'video00'], Path('npy/image_train'), 100)
 
 
 # def image_generator(video_dirs, batch_size):
