@@ -56,7 +56,7 @@ def main():
         'epochs': 30,
         'validation_data': val_gen,
         'validation_steps': n_val // batch_size,
-        'callbacks': get_callbacks('convlstm')
+        'callbacks': get_callbacks('timeconv')
     }
 
     model.fit_generator(**fit_arg)
