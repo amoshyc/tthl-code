@@ -58,6 +58,9 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
         del xs, ys
 
 def image_generator(npy_dir, batch_size):
+    if not npy_dir.exists():
+        print(npy_dir, 'not exist')
+
     x_paths = sorted(npy_dir.glob('x_*.npy'))
     y_paths = sorted(npy_dir.glob('y_*.npy'))
 

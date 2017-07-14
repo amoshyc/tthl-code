@@ -44,7 +44,7 @@ def main():
     batch_size = 40
 
     train_npy_dir = Path('npy/image_train')
-    val_npy_dir = Path('npy/iamge_val')
+    val_npy_dir = Path('npy/image_val')
     train_gen = image_generator(train_npy_dir, batch_size)
     val_gen = image_generator(val_npy_dir, batch_size)
 
