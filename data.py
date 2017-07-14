@@ -6,7 +6,7 @@ import numpy as np
 from keras.preprocessing import image
 
 def read_img(path, target_size=(224, 224)):
-    pil = image.load_img(path, target_size)
+    pil = image.load_img(path, target_size=target_size)
     return image.img_to_array(pil)
 
 def image_generator(video_dirs, n_samples, batch_size):
