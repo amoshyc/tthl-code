@@ -20,6 +20,7 @@ def process(video_dir, gen_frames=True, gen_highlight=True, gen_label=True):
     video_path = video_dir / 'video.mp4'
     hl_path = video_dir / 'highlight.mp4'
     info_path = video_dir / 'info.json'
+    label_path = video_dir / 'label.json'
     frame_dir = video_dir / 'frames/'
     frame_fmt = frame_dir / '%08d.jpg'
     frame_dir.mkdir(exist_ok=True)
@@ -48,7 +49,7 @@ def process(video_dir, gen_frames=True, gen_highlight=True, gen_label=True):
             fe = round(e * video.fps)
             for i in range(fs, fe + 1):
                 label['label'][i] = 1
-        with info_path.open('w') as f:
+        with label_path.open('w') as f:
             json.dump(label, f, ensure_ascii=False)
         print('ok')
 
@@ -60,7 +61,7 @@ def process_all():
         print(video_dir, '({}/{})'.format(i + 1, len(video_dirs)))
         print()
         process(
-            video_dir, gen_frames=True, gen_highlight=False, gen_label=True)
+            video_dir, gen_frames=False, gen_highlight=False, gen_label=True)
         print('*' * 50)
 
 

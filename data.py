@@ -15,7 +15,7 @@ def image_generator(video_dirs, n_samples, batch_size):
     y_all = []
     for video_dir in video_dirs:
         imgs = sorted((video_dir / 'frames/').iterdir())
-        label = json.load((video_dir / 'info.json').open())['label']
+        label = json.load((video_dir / 'label.json').open())['label']
         x_all.extend(imgs)
         y_all.extend(label)
     
@@ -43,7 +43,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
     while True:
         for video_dir in video_dirs:
             xs = sorted((video_dir / 'frames/').iterdir())
-            ys = json.load((video_dir / 'info.json').open())['label']
+            ys = json.load((video_dir / 'label.json').open())['label']
 
             # [i, i + timesteps)
             windows = [(i, i + timesteps) for i in range(len(xs) - timesteps + 1)]
