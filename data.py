@@ -111,8 +111,8 @@ if __name__ == '__main__':
 
     # gen_image_npy([dataset / 'video01'], image_val, 5000)
     # gen_image_npy([dataset / 'video00'], image_train, 25000)
-    gen_window_npy([dataset / 'video00'], window_train, 2500)
-    # gen_window_npy([dataset / 'video01'], window_val, 5000)
+    gen_window_npy([dataset / 'video00'], window_train, 2500, 30)
+    # gen_window_npy([dataset / 'video01'], window_val, 5000, 30)
 
 
 
