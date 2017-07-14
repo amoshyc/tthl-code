@@ -20,8 +20,13 @@ from utils import get_callbacks
 
 
 def main():
+    n_train = 25000
+    n_val = 5000
+    batch_size = 40
+    timesteps = 10
+
     model = Sequential()
-    model.add(TimeDistributed(BatchNormalization(), input_shape=(10, 224, 224, 3)))
+    model.add(TimeDistributed(BatchNormalization(), input_shape=(timesteps, 224, 224, 3)))
     model.add(TimeDistributed(Conv2D(4, kernel_size=5, strides=3, activation='relu')))
     model.add(TimeDistributed(Conv2D(8, kernel_size=5, strides=2, activation='relu')))
     model.add(TimeDistributed(Conv2D(12, kernel_size=3, strides=1, activation='relu')))
@@ -39,16 +44,12 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    n_train = 25000
-    n_val = 5000
-    batch_size = 40
-
     dataset = Path('~/dataset/').expanduser().resolve()
     video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
     train_dirs = [(dataset / 'video01/')]
     val_dirs = [(dataset / 'video00')]
-    train_gen = window_generator(train_dirs, n_train, batch_size)
-    val_gen = window_generator(val_dirs, n_val, batch_size)
+    train_gen = window_generator(train_dirs, n_train, batch_size, timesteps)
+    val_gen = window_generator(val_dirs, n_val, batch_size, timesteps)
 
     fit_arg = {
         'generator': train_gen,
