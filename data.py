@@ -47,7 +47,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
 
             # [i, i + timesteps)
             windows = [(i, i + timesteps) for i in range(len(xs) - timesteps + 1)]
-            random.shuffle(windows)
+            # random.shuffle(windows)
 
             for (s, e) in windows:
                 for f in range(s, e):
