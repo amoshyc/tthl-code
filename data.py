@@ -1,6 +1,6 @@
 import json
+import random
 from pathlib import Path
-from random import shuffle
 
 import numpy as np
 from keras.preprocessing import image
@@ -47,7 +47,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
 
             # [i, i + timesteps)
             windows = [(i, i + timesteps) for i in range(len(xs) - timesteps + 1)]
-            windows = shuffle(windows)
+            random.shuffle(windows)
 
             for (s, e) in windows:
                 for f in range(s, e):
