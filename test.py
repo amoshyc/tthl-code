@@ -9,7 +9,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
     videos = [VideoFileClip(str(x / 'video.mp4')) for x in video_dirs]
 
     windows = []
-    for video_id, (video, label) in enumerate(zip(videos, labels)):
+    for video_id, video in enumerate(video):
         fps, dur = video.fps, video.duration
         n_frames = round(dur * fps)
         start = (e - timesteps) / fps
