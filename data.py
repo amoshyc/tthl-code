@@ -5,7 +5,7 @@ from pprint import pprint
 
 import numpy as np
 from tqdm import tqdm
-from utils import *
+from utils import sample, split, read_json, read_img
 
 DATASET = Path('~/dataset/').expanduser()
 DIRS = [x for x in DATASET.iterdir() if x.is_dir()]
