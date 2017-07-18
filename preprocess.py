@@ -63,7 +63,7 @@ def process_all():
     video_dirs = [x for x in dataset_dir.iterdir() if x.is_dir()]
     for i, video_dir in enumerate(video_dirs):
         print(video_dir, '({}/{})'.format(i + 1, len(video_dirs)))
-        process(video_dir)
+        process(video_dir, gen_label=True)
         print('*' * 50)
 
 
