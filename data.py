@@ -105,20 +105,20 @@ def window_generator(npy_dir, batch_size):
 
 
 if __name__ == '__main__':
-    dataset = Path('~/dataset/').expanduser()
+    DATASET = Path('~/dataset/').expanduser()
 
-    train_dirs = [dataset / 'video00']
-    val_dirs = [dataset / 'video01']
+    TRAIN_DIRS = DATASET[:-1]
+    VAL_DIRS = DATASET[-1:]
 
-    image_train = Path('npy/image_train')
-    image_val = Path('npy/image_val')
-    window_train = Path('npy/window_train')
-    window_val = Path('npy/window_val')
+    IMAGE_TRAIN = Path('npy/image_train')
+    IMAGE_VAL = Path('npy/image_val')
+    WINDOW_TRAIN = Path('npy/window_train')
+    WINDOW_VAL = Path('npy/window_val')
 
-    for folder in [image_train, image_val, window_train, window_val]:
+    for folder in [IMAGE_TRAIN, IMAGE_VAL, WINDOW_TRAIN, WINDOW_VAL]:
         folder.mkdir(parents=True, exist_ok=True)
 
-    gen_image_npy([dataset / 'video01'], image_val, 5000)
-    gen_image_npy([dataset / 'video00'], image_train, 25000)
-    gen_window_npy(train_dirs, window_train, 25000, 30)
-    gen_window_npy(val_dirs, window_val, 5000, 30)
+    gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, 25000)
+    gen_image_npy(VAL_DIRS, IMAGE_VAL, 5000)
+    gen_window_npy(TRAIN_DIRS, WINDOW_TRAIN, 25000, 30)
+    gen_window_npy(VAL_DIRS, WINDOW_VAL, 5000, 30)

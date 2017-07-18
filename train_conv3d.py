@@ -15,8 +15,7 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-# from data import window_generator
-from test import window_generator
+from data import window_generator
 from utils import get_callbacks
 
 
