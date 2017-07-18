@@ -26,7 +26,7 @@ TIMESTEPS = 30
 
 def check():
     for folder in DIRS:
-        label = read_json(folder / 'label.json')
+        label = read_json(folder / 'label.json')['label']
         label_len = len(label)
         n_frames = len(list((folder / 'frames/').iterdir()))
         assert n_frames == label_len, '{}: {}, {}'.format(folder, label_len, n_frames)
