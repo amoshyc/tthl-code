@@ -108,8 +108,8 @@ if __name__ == '__main__':
     DATASET = Path('~/dataset/').expanduser()
     DIRS = [x for x in DATASET.iterdir() if x.is_dir()]
 
-    TRAIN_DIRS = DATASET[:-1]
-    VAL_DIRS = DATASET[-1:]
+    TRAIN_DIRS = DIRS[:-1]
+    VAL_DIRS = DIRS[-1:]
 
     IMAGE_TRAIN = Path('npy/image_train')
     IMAGE_VAL = Path('npy/image_val')
