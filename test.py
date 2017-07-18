@@ -26,7 +26,9 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
     y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
     for video_id, s, e, label in windows:
-        clip = list(videos[video_id].subclip(s, e).iter_frames())
+        clip = videos[video_id].subclip(s, e)
+        clip = videos.resize((224, 224))
+        clip = list(clip.iter_frames())
         assert len(clip) == timesteps, 'len(clip) != timesteps'
 
         x_batch[idx] = np.array(clip, dtype=np.float32)
