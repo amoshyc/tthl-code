@@ -53,10 +53,9 @@ def process(video_dir, gen_frames=False, gen_highlight=False, gen_label=False):
             fs = round(s * video.fps)
             fe = round(e * video.fps)
             for i in range(fs, fe + 1):
-                try:
-                    label['label'][i] = 1
-                except:
+                if i >= n_frames:
                     print(i)
+                label['label'][i] = 1
         with label_path.open('w') as f:
             json.dump(label, f, ensure_ascii=False)
         print('ok')
