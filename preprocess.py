@@ -46,7 +46,7 @@ def process(video_dir, gen_frames=False, gen_highlight=False, gen_label=False):
 
     if gen_label:
         print('Generating label...', end='')
-        n_frames = round(video.duration * video.fps)
+        n_frames = len(list(frame_dir.iterdir()))
         label = {'label': [0 for _ in range(n_frames)]}
         for s, e in zip(info['starts'], info['ends']):
             fs = round(s * video.fps)
@@ -68,6 +68,6 @@ def process_all():
 
 
 if __name__ == '__main__':
-    # process_all()
-    video_dir = Path('~/dataset/video05').expanduser().resolve()
-    process(video_dir, gen_frames=True, gen_highlight=False, gen_label=True)
+    process_all()
+    # video_dir = Path('~/dataset/video05').expanduser().resolve()
+    # process(video_dir, gen_frames=True, gen_highlight=False, gen_label=True)

@@ -72,7 +72,7 @@ def gen_window_npy(video_dirs, target_dir, n_samples):
     parts = split(x_use, y_use, k=200)
     for idx, x_part, y_part in tqdm(parts):
         n = len(x_part)
-        xs = np.zeros((n, timesteps, 224, 224, 3), dtype=np.float32)
+        xs = np.zeros((n, TIMESTEPS, 224, 224, 3), dtype=np.float32)
         ys = np.zeros((n, 1), dtype=np.uint8)
         for i in range(n):
             (video_dir, s, e) = x_part[i]
