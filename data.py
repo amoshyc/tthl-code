@@ -24,6 +24,13 @@ N_WINDOW_TRAIN = 25000
 N_WINDOW_VAL = 2000
 TIMESTEPS = 30
 
+def check():
+    for folder in DIRS:
+        label = json.load((folder / 'label.json').open())
+        label_len = len(label)
+        n_frames = len(list((folder / 'frames/').iterdir()))
+        assert n_frames == label_len, '{}: {}, {}'.format(folder, label_len, n_frames)
+
 
 def gen_image_npy(video_dirs, target_dir, n_samples):
     x_all = []
@@ -49,14 +56,14 @@ def gen_image_npy(video_dirs, target_dir, n_samples):
         del xs, ys
 
 
-def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
+def gen_window_npy(video_dirs, target_dir, n_samples):
     x_all = []
     y_all = []
     for video_dir in video_dirs:
         n_frames = len(list((video_dir / 'frames/').iterdir()))
         labels = read_json(video_dir / 'label.json')['label']
-        windows = [(video_dir, i, i + timesteps)
-                   for i in range(n_frames - timesteps + 1)]
+        windows = [(video_dir, i, i + TIMESTEPS)
+                   for i in range(n_frames - TIMESTEPS)]
         x_all.extend(windows)
         y_all.extend([labels[e - 1] for (_, s, e) in windows])
 
@@ -127,6 +134,8 @@ window_train_gen = window_generator(WINDOW_TRAIN, 30)
 window_val_gen = window_generator(WINDOW_VAL, 30)
 
 if __name__ == '__main__':
+    check()
+
     for folder in [IMAGE_TRAIN, IMAGE_VAL, WINDOW_TRAIN, WINDOW_VAL]:
         folder.mkdir(parents=True, exist_ok=True)
 
@@ -135,7 +144,7 @@ if __name__ == '__main__':
     print('Validation data:')
     pprint(VAL_DIRS)
 
-    gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, N_IMAGE_TRAIN)
-    gen_image_npy(VAL_DIRS, IMAGE_VAL, N_IMAGE_VAL)
-    gen_window_npy(TRAIN_DIRS, WINDOW_TRAIN, N_WINDOW_TRAIN, TIMESTEPS)
-    gen_window_npy(VAL_DIRS, WINDOW_VAL, N_WINDOW_VAL, TIMESTEPS)
+    # gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, N_IMAGE_TRAIN)
+    # gen_image_npy(VAL_DIRS, IMAGE_VAL, N_IMAGE_VAL)
+    gen_window_npy(TRAIN_DIRS, WINDOW_TRAIN, N_WINDOW_TRAIN)
+    gen_window_npy(VAL_DIRS, WINDOW_VAL, N_WINDOW_VAL)
