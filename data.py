@@ -1,6 +1,7 @@
 import json
 import random
 from pathlib import Path
+from pprint import pprint
 
 import numpy as np
 from tqdm import tqdm
@@ -128,6 +129,11 @@ window_val_gen = window_generator(WINDOW_VAL, 30)
 if __name__ == '__main__':
     for folder in [IMAGE_TRAIN, IMAGE_VAL, WINDOW_TRAIN, WINDOW_VAL]:
         folder.mkdir(parents=True, exist_ok=True)
+
+    print('Train data:')
+    pprint(TRAIN_DIRS)
+    print('Validation data:')
+    pprint(VAL_DIRS)
 
     gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, N_IMAGE_TRAIN)
     gen_image_npy(VAL_DIRS, IMAGE_VAL, N_IMAGE_VAL)
