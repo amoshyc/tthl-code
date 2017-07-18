@@ -106,6 +106,7 @@ def window_generator(npy_dir, batch_size):
 
 if __name__ == '__main__':
     DATASET = Path('~/dataset/').expanduser()
+    DIRS = [x for x in DATASET.iterdir() if x.is_dir()]
 
     TRAIN_DIRS = DATASET[:-1]
     VAL_DIRS = DATASET[-1:]
