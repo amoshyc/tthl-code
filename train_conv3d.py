@@ -15,7 +15,8 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-from data import window_generator
+# from data import window_generator
+from test import window_generator
 from utils import get_callbacks
 
 
@@ -48,8 +49,8 @@ def main():
 
     dataset = Path('~/dataset/').expanduser().resolve()
     video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
-    train_dirs = [(dataset / 'video01/')]
-    val_dirs = [(dataset / 'video00')]
+    train_dirs = video_dirs[:-1]
+    val_dirs = video_dirs[-1:]
     train_gen = window_generator(train_dirs, batch_size, timesteps)
     val_gen = window_generator(val_dirs, batch_size, timesteps)
 

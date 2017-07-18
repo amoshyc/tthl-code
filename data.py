@@ -6,6 +6,7 @@ import numpy as np
 from tqdm import tqdm
 from utils import *
 
+
 def gen_image_npy(video_dirs, target_dir, n_samples):
     x_all = []
     y_all = []
@@ -14,7 +15,7 @@ def gen_image_npy(video_dirs, target_dir, n_samples):
         label = json.load((video_dir / 'label.json').open())['label']
         x_all.extend(imgs)
         y_all.extend(label)
-    
+
     x_use, y_use = sample(x_all, y_all, k=n_samples)
 
     parts = split(x_use, y_use, k=1000)
@@ -36,7 +37,8 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
     for video_dir in video_dirs:
         n_frames = len(list((video_dir / 'frames/').iterdir()))
         labels = read_json(video_dir / 'label.json')['label']
-        windows = [(video_dir, i, i + timesteps) for i in range(n_frames - timesteps + 1)]
+        windows = [(video_dir, i, i + timesteps)
+                   for i in range(n_frames - timesteps + 1)]
         x_all.extend(windows)
         y_all.extend([labels[e - 1] for (_, s, e) in windows])
 
@@ -57,6 +59,7 @@ def gen_window_npy(video_dirs, target_dir, n_samples, timesteps):
         np.save(str(target_dir / 'x_{:05d}.npy'.format(idx)), xs)
         np.save(str(target_dir / 'y_{:05d}.npy'.format(idx)), ys)
         del xs, ys
+
 
 def image_generator(npy_dir, batch_size):
     x_paths = sorted(npy_dir.glob('x_*.npy'))
@@ -98,7 +101,8 @@ def window_generator(npy_dir, batch_size):
                     yield x_batch, y_batch
                 idx = (idx + 1) % batch_size
             del x_part, y_part
-    
+
+
 
 if __name__ == '__main__':
     dataset = Path('~/dataset/').expanduser()
