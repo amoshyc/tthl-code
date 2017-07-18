@@ -47,12 +47,16 @@ def process(video_dir, gen_frames=False, gen_highlight=False, gen_label=False):
     if gen_label:
         print('Generating label...', end='')
         n_frames = len(list(frame_dir.iterdir()))
+        print('n_frames =', n_frames)
         label = {'label': [0 for _ in range(n_frames)]}
         for s, e in zip(info['starts'], info['ends']):
             fs = round(s * video.fps)
             fe = round(e * video.fps)
             for i in range(fs, fe + 1):
-                label['label'][i] = 1
+                try:
+                    label['label'][i] = 1
+                except:
+                    print(i)
         with label_path.open('w') as f:
             json.dump(label, f, ensure_ascii=False)
         print('ok')
