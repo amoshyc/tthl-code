@@ -27,7 +27,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
 
     for video_id, s, e, label in windows:
         clip = videos[video_id].subclip(s, e)
-        clip = videos.resize((224, 224))
+        clip = clip.resize((224, 224))
         clip = list(clip.iter_frames())
         assert len(clip) == timesteps, 'len(clip) != timesteps'
 
