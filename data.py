@@ -8,7 +8,7 @@ from tqdm import tqdm
 from utils import sample, split, read_json, read_img
 
 DATASET = Path('~/dataset/').expanduser()
-DIRS = [x for x in DATASET.iterdir() if x.is_dir()]
+DIRS = sorted([x for x in DATASET.iterdir() if x.is_dir()])
 
 TRAIN_DIRS = DIRS[:-1]
 VAL_DIRS = DIRS[-1:]
