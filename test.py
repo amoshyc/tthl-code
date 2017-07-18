@@ -29,7 +29,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
         clip = videos[video_id].subclip(s, e)
         clip = clip.resize((224, 224))
         clip = list(clip.iter_frames())
-        assert len(clip) == timesteps, 'len(clip) != timesteps'
+        assert len(clip) == timesteps, '{}'.format(len(clip))
 
         x_batch[idx] = np.array(clip, dtype=np.float32)
         y_batch[idx] = label
