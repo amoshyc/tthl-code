@@ -2,6 +2,7 @@ import json
 import random
 from pathlib import Path
 import numpy as np
+from scipy.misc import imresize
 from moviepy.editor import VideoFileClip
 
 
@@ -15,8 +16,8 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
     for video_id, (video, label) in enumerate(zip(videos, labels)):
         fps, dur = video.fps, video.duration
         n_frames = round(dur * fps)
-        cur_windows = [(video_id, (e - timesteps) / fps, (e - 1) / fps, label[e - 1])
-                       for e in range(timesteps, n_frames)]
+        cur_windows = [(video_id, t - 1, label[t - 1])
+                       for t in range(timesteps, n_frames)]
         windows.extend(cur_windows)
 
     windows = random.sample(windows, k=n_samples)
@@ -25,13 +26,11 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
     x_batch = np.zeros((batch_size, timesteps, 224, 224, 3), dtype=np.float32)
     y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
-    for video_id, s, e, label in windows:
-        clip = videos[video_id].subclip(s, e)
-        clip = clip.resize((224, 224))
-        clip = list(clip.iter_frames())
-        assert len(clip) == timesteps, '{}'.format(len(clip))
-
-        x_batch[idx] = np.array(clip, dtype=np.float32)
+    for video_id, e, label in windows:
+        for t in range(timesteps):
+            time = (e - t) / videos[video_id].fps
+            img = videos[video_id].get_frame(time)
+            x_batch[idx][timesteps - 1 - t] = imresize(img, (224, 224))
         y_batch[idx] = label
 
         if idx + 1 == batch_size:
