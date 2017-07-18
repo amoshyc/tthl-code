@@ -5,14 +5,14 @@ import numpy as np
 from moviepy.editor import VideoFileClip
 
 
-def window_generator(video_dirs, n_samples, batch_size, timsteps):
+def window_generator(video_dirs, n_samples, batch_size, timesteps):
     videos = [VideoFileClip(str(x / 'video.mp4')) for x in video_dirs]
 
     windows = []
     for video_id, (video, label) in enumerate(zip(videos, labels)):
         fps, dur = video.fps, video.duration
         n_frames = round(dur * fps)
-        start = (e - timsteps) / fps
+        start = (e - timesteps) / fps
         end = (e) / fps
         label = json.load((x / 'label.json').open())['label']
         cur_windows = [(video_id, start, end, label[e - 1])

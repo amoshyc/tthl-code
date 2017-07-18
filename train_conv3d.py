@@ -51,8 +51,8 @@ def main():
     video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
     train_dirs = video_dirs[:-1]
     val_dirs = video_dirs[-1:]
-    train_gen = window_generator(train_dirs, batch_size, timesteps)
-    val_gen = window_generator(val_dirs, batch_size, timesteps)
+    train_gen = window_generator(train_dirs, 10000, batch_size, timesteps)
+    val_gen = window_generator(val_dirs, 2000, batch_size, timesteps)
 
     fit_arg = {
         'generator': train_gen,
