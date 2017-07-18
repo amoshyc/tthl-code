@@ -6,6 +6,23 @@ import numpy as np
 from tqdm import tqdm
 from utils import *
 
+DATASET = Path('~/dataset/').expanduser()
+DIRS = [x for x in DATASET.iterdir() if x.is_dir()]
+
+TRAIN_DIRS = DIRS[:-1]
+VAL_DIRS = DIRS[-1:]
+
+IMAGE_TRAIN = Path('npy/image_train')
+IMAGE_VAL = Path('npy/image_val')
+WINDOW_TRAIN = Path('npy/window_train')
+WINDOW_VAL = Path('npy/window_val')
+
+N_IMAGE_TRAIN = 25000
+N_IMAGE_VAL = 5000
+N_WINDOW_TRAIN = 25000
+N_WINDOW_VAL = 2000
+TIMESTEPS = 30
+
 
 def gen_image_npy(video_dirs, target_dir, n_samples):
     x_all = []
@@ -86,8 +103,8 @@ def window_generator(npy_dir, batch_size):
     x_paths = sorted(npy_dir.glob('x_*.npy'))
     y_paths = sorted(npy_dir.glob('y_*.npy'))
 
-    idx, timesteps = 0, 30
-    x_batch = np.zeros((batch_size, timesteps, 224, 224, 3), dtype=np.float32)
+    idx = 0
+    x_batch = np.zeros((batch_size, TIMESTEPS, 224, 224, 3), dtype=np.float32)
     y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
     while True:
@@ -103,23 +120,16 @@ def window_generator(npy_dir, batch_size):
             del x_part, y_part
 
 
+image_train_gen = image_generator(IMAGE_TRAIN, 40)
+image_val_gen = image_generator(IMAGE_VAL, 40)
+window_train_gen = window_generator(WINDOW_TRAIN, 30)
+window_val_gen = window_generator(WINDOW_VAL, 30)
 
 if __name__ == '__main__':
-    DATASET = Path('~/dataset/').expanduser()
-    DIRS = [x for x in DATASET.iterdir() if x.is_dir()]
-
-    TRAIN_DIRS = DIRS[:-1]
-    VAL_DIRS = DIRS[-1:]
-
-    IMAGE_TRAIN = Path('npy/image_train')
-    IMAGE_VAL = Path('npy/image_val')
-    WINDOW_TRAIN = Path('npy/window_train')
-    WINDOW_VAL = Path('npy/window_val')
-
     for folder in [IMAGE_TRAIN, IMAGE_VAL, WINDOW_TRAIN, WINDOW_VAL]:
         folder.mkdir(parents=True, exist_ok=True)
 
-    gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, 25000)
-    gen_image_npy(VAL_DIRS, IMAGE_VAL, 5000)
-    gen_window_npy(TRAIN_DIRS, WINDOW_TRAIN, 25000, 30)
-    gen_window_npy(VAL_DIRS, WINDOW_VAL, 5000, 30)
+    gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, N_IMAGE_TRAIN)
+    gen_image_npy(VAL_DIRS, IMAGE_VAL, N_IMAGE_VAL)
+    gen_window_npy(TRAIN_DIRS, WINDOW_TRAIN, N_WINDOW_TRAIN, TIMESTEPS)
+    gen_window_npy(VAL_DIRS, WINDOW_VAL, N_WINDOW_VAL, TIMESTEPS)

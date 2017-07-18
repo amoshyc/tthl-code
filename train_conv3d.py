@@ -15,7 +15,7 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-from data import window_generator
+from data import *
 from utils import get_callbacks
 
 
@@ -46,19 +46,12 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    dataset = Path('~/dataset/').expanduser().resolve()
-    video_dirs = sorted([x for x in dataset.iterdir() if x.is_dir()])
-    train_dirs = video_dirs[:-1]
-    val_dirs = video_dirs[-1:]
-    train_gen = window_generator(train_dirs, 10000, batch_size, timesteps)
-    val_gen = window_generator(val_dirs, 2000, batch_size, timesteps)
-
     fit_arg = {
-        'generator': train_gen,
-        'steps_per_epoch': n_train // batch_size,
+        'generator': window_train_gen,
+        'steps_per_epoch': N_WINDOW_TRAIN // batch_size,
         'epochs': 30,
-        'validation_data': val_gen,
-        'validation_steps': n_val // batch_size,
+        'validation_data': window_val_gen,
+        'validation_steps': N_WINDOW_VAL // batch_size,
         'callbacks': get_callbacks('timeconv')
     }
 
