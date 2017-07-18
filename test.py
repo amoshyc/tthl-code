@@ -15,7 +15,7 @@ def window_generator(video_dirs, n_samples, batch_size, timesteps):
     for video_id, (video, label) in enumerate(zip(videos, labels)):
         fps, dur = video.fps, video.duration
         n_frames = round(dur * fps)
-        cur_windows = [(video_id, (e - timesteps) / fps, (e) / fps, label[e - 1])
+        cur_windows = [(video_id, (e - timesteps) / fps, (e - 1) / fps, label[e - 1])
                        for e in range(timesteps, n_frames)]
         windows.extend(cur_windows)
 
