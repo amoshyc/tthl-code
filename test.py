@@ -2,7 +2,7 @@ import json
 import random
 from pathlib import Path
 import numpy as np
-from moveipy.editor import VideoFileclip
+from moviepy.editor import VideoFileclip
 
 
 def window_generator(video_dirs, n_samples, batch_size, timsteps):
