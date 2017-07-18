@@ -68,6 +68,6 @@ def process_all():
 
 
 if __name__ == '__main__':
-    process_all()
-    # video_dir = Path('~/dataset/video01').expanduser().resolve()
-    # process(video_dir, gen_frames=True, gen_highlight=False, gen_label=True)
+    # process_all()
+    video_dir = Path('~/dataset/video05').expanduser().resolve()
+    process(video_dir, gen_frames=True, gen_highlight=False, gen_label=True)
