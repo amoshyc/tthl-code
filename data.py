@@ -151,7 +151,7 @@ def window_generator_online(video_dirs, n_samples, batch_size):
     while True: 
         for video_dir, s, e, label in windows:
             for i in range(e - s):
-                img_path = video_dir / 'frames' / '{:08d}'.format(s + i)
+                img_path = video_dir / 'frames' / '{:08d}.jpg'.format(s + i)
                 x_batch[idx][i] = read_img(img_path)
             y_batch[idx] = label
 
