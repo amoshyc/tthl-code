@@ -20,16 +20,17 @@ from utils import get_callbacks
 
 
 def main():
-    model = Sequential()
-    model.add(BatchNormalization(input_shape=(224, 224, 3)))
-    model.add(Conv2D(4, kernel_size=5, strides=3, activation='relu'))
-    model.add(Conv2D(8, kernel_size=5, strides=2, activation='relu'))
-    model.add(Conv2D(12, kernel_size=3, strides=1, activation='relu'))
-    model.add(MaxPooling2D(pool_size=3))
-    model.add(Flatten())
-    model.add(Dense(30))
-    model.add(Dropout(0.3))
-    model.add(Dense(1, activation='sigmoid'))
+    with tf.device('/gpu:2'):
+        model = Sequential()
+        model.add(BatchNormalization(input_shape=(224, 224, 3)))
+        model.add(Conv2D(4, kernel_size=5, strides=3, activation='relu'))
+        model.add(Conv2D(8, kernel_size=5, strides=2, activation='relu'))
+        model.add(Conv2D(12, kernel_size=3, strides=1, activation='relu'))
+        model.add(MaxPooling2D(pool_size=3))
+        model.add(Flatten())
+        model.add(Dense(30))
+        model.add(Dropout(0.3))
+        model.add(Dense(1, activation='sigmoid'))
 
     model_arg = {
         'loss': 'binary_crossentropy',
