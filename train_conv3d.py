@@ -49,7 +49,7 @@ def main():
         'epochs': 30,
         'validation_data': window_val_gen,
         'validation_steps': N_WINDOW_VAL // WINDOW_BATCH_SIZE,
-        'callbacks': get_callbacks('timeconv')
+        'callbacks': get_callbacks('conv3d')
     }
 
     model.fit_generator(**fit_arg)
