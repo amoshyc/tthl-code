@@ -179,7 +179,7 @@ if __name__ == '__main__':
     print('Validation data:')
     pprint(VAL_DIRS)
 
-    # gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, N_IMAGE_TRAIN)
-    # gen_image_npy(VAL_DIRS, IMAGE_VAL, N_IMAGE_VAL)
-    gen_window_npy(TRAIN_DIRS, WINDOW_TRAIN, N_WINDOW_TRAIN)
-    gen_window_npy(VAL_DIRS, WINDOW_VAL, N_WINDOW_VAL)
+    gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, N_IMAGE_TRAIN)
+    gen_image_npy(VAL_DIRS, IMAGE_VAL, N_IMAGE_VAL)
+    # gen_window_npy(TRAIN_DIRS, WINDOW_TRAIN, N_WINDOW_TRAIN)
+    # gen_window_npy(VAL_DIRS, WINDOW_VAL, N_WINDOW_VAL)

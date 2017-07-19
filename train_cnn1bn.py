@@ -15,7 +15,7 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-from data import image_generator
+from data import *
 from utils import get_callbacks
 
 
@@ -39,21 +39,12 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    n_train = 25000
-    n_val = 5000
-    batch_size = 40
-
-    train_npy_dir = Path('npy/image_train')
-    val_npy_dir = Path('npy/image_val')
-    train_gen = image_generator(train_npy_dir, batch_size)
-    val_gen = image_generator(val_npy_dir, batch_size)
-
     fit_arg = {
-        'generator': train_gen,
-        'steps_per_epoch': n_train // batch_size,
+        'generator': image_train_gen,
+        'steps_per_epoch': N_IMAGE_TRAIN // IMAGE_BATCH_SIZE,
         'epochs': 30,
-        'validation_data': val_gen,
-        'validation_steps': n_val // batch_size,
+        'validation_data': image_val_gen,
+        'validation_steps': N_IMAGE_VAL // IMAGE_BATCH_SIZE,
         'callbacks': get_callbacks('cnn1bn')
     }
 
