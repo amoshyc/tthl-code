@@ -148,7 +148,7 @@ def window_generator_online(video_dirs, n_samples, batch_size):
     x_batch = np.zeros((batch_size, TIMESTEPS, 224, 224, 3), dtype=np.float32)
     y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
-    while True:
+    while True: 
         for video_dir, s, e, label in windows:
             for i in range(e - s):
                 img_path = video_dir / 'frames' / '{:08d}'.format(s + i)
@@ -163,7 +163,7 @@ def window_generator_online(video_dirs, n_samples, batch_size):
 image_train_gen = image_generator(IMAGE_TRAIN, 40)
 image_val_gen = image_generator(IMAGE_VAL, 40)
 window_train_gen = window_generator_online(TRAIN_DIRS, WINDOW_TRAIN, WINDOW_BATCH_SIZE)
-window_val_gen = window_generator_online(VAL_DIRS, WINDOW_BATCH_SIZE)
+window_val_gen = window_generator_online(VAL_DIRS, WINDOW_VAL, WINDOW_BATCH_SIZE)
 
 if __name__ == '__main__':
     check()
