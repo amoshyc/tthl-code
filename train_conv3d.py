@@ -44,10 +44,10 @@ def main():
     model.summary()
 
     fit_arg = {
-        'generator': window_train_gen,
+        'generator': window_train_gen_online,
         'steps_per_epoch': N_WINDOW_TRAIN // WINDOW_BATCH_SIZE,
         'epochs': 30,
-        'validation_data': window_val_gen,
+        'validation_data': window_val_gen_online,
         'validation_steps': N_WINDOW_VAL // WINDOW_BATCH_SIZE,
         'callbacks': get_callbacks('conv3d')
     }
