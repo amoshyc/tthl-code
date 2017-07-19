@@ -24,6 +24,9 @@ N_WINDOW_TRAIN = 25000
 N_WINDOW_VAL = 5000
 TIMESTEPS = 30
 
+IMAGE_BATCH_SIZE = 40
+WINDOW_BATCH_SIZE = 30
+
 def check():
     for folder in DIRS:
         label = read_json(folder / 'label.json')['label']
@@ -130,8 +133,8 @@ def window_generator(npy_dir, batch_size):
 
 image_train_gen = image_generator(IMAGE_TRAIN, 40)
 image_val_gen = image_generator(IMAGE_VAL, 40)
-window_train_gen = window_generator(WINDOW_TRAIN, 30)
-window_val_gen = window_generator(WINDOW_VAL, 30)
+window_train_gen = window_generator(WINDOW_TRAIN, WINDOW_BATCH_SIZE)
+window_val_gen = window_generator(WINDOW_VAL, WINDOW_BATCH_SIZE)
 
 if __name__ == '__main__':
     check()

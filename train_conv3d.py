@@ -20,11 +20,6 @@ from utils import get_callbacks
 
 
 def main():
-    n_train = 25000
-    n_val = 5000
-    batch_size = 40
-    timesteps = 10
-
     model = Sequential()
     model.add(TimeDistributed(BatchNormalization(), input_shape=(timesteps, 224, 224, 3)))
     model.add(TimeDistributed(Conv2D(4, kernel_size=5, strides=3, activation='relu')))
@@ -48,10 +43,10 @@ def main():
 
     fit_arg = {
         'generator': window_train_gen,
-        'steps_per_epoch': N_WINDOW_TRAIN // batch_size,
+        'steps_per_epoch': N_WINDOW_TRAIN // WINDOW_BATCH_SIZE,
         'epochs': 30,
         'validation_data': window_val_gen,
-        'validation_steps': N_WINDOW_VAL // batch_size,
+        'validation_steps': N_WINDOW_VAL // WINDOW_BATCH_SIZE,
         'callbacks': get_callbacks('timeconv')
     }
 
