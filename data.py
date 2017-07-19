@@ -162,8 +162,8 @@ def window_generator_online(video_dirs, n_samples, batch_size):
 
 image_train_gen = image_generator(IMAGE_TRAIN, 40)
 image_val_gen = image_generator(IMAGE_VAL, 40)
-window_train_gen = window_generator_online(WINDOW_TRAIN, WINDOW_BATCH_SIZE)
-window_val_gen = window_generator_online(WINDOW_VAL, WINDOW_BATCH_SIZE)
+window_train_gen = window_generator_online(TRAIN_DIRS, WINDOW_TRAIN, WINDOW_BATCH_SIZE)
+window_val_gen = window_generator_online(VAL_DIRS, WINDOW_BATCH_SIZE)
 
 if __name__ == '__main__':
     check()
