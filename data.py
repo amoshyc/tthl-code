@@ -135,21 +135,24 @@ def window_generator(npy_dir, batch_size):
 
 
 def window_generator_online(video_dirs, n_samples, batch_size):
-    windows = []
+    x_all = []
+    y_all = []
     for video_dir in video_dirs:
         n_frames = len(list((video_dir / 'frames/').iterdir()))
-        label = read_json(video_dir / 'label.json')['label']
-        cur_windows = [(video_dir, t - TIMESTEPS, t, label[t - 1])
-                       for t in range(TIMESTEPS, n_frames)]
-        windows.extend(cur_windows)
-    windows = random.sample(windows, n_samples)
+        labels = read_json(video_dir / 'label.json')['label']
+        windows = [(video_dir, i, i + TIMESTEPS)
+                   for i in range(n_frames - TIMESTEPS)]
+        x_all.extend(windows)
+        y_all.extend([labels[e - 1] for (_, s, e) in windows])
+
+    x_use, y_use = sample(x_all, y_all, k=n_samples)
 
     idx = 0
     x_batch = np.zeros((batch_size, TIMESTEPS, 224, 224, 3), dtype=np.float32)
     y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
     while True: 
-        for video_dir, s, e, label in windows:
+        for (video_dir, s, e), (label) in zip(x_use, y_use):
             for i in range(e - s):
                 img_path = video_dir / 'frames' / '{:08d}.jpg'.format(s + i)
                 x_batch[idx][i] = read_img(img_path)
