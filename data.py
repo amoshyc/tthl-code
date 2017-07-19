@@ -6,6 +6,7 @@ from pprint import pprint
 import numpy as np
 from tqdm import tqdm
 from utils import sample, split, read_json, read_img
+from moviepy.editor import VideoFileClip
 
 DATASET = Path('~/dataset/').expanduser()
 DIRS = sorted([x for x in DATASET.iterdir() if x.is_dir()])
@@ -27,12 +28,14 @@ TIMESTEPS = 30
 IMAGE_BATCH_SIZE = 40
 WINDOW_BATCH_SIZE = 30
 
+
 def check():
     for folder in DIRS:
         label = read_json(folder / 'label.json')['label']
         label_len = len(label)
         n_frames = len(list((folder / 'frames/').iterdir()))
-        assert n_frames == label_len, '{}: {}, {}'.format(folder, label_len, n_frames)
+        assert n_frames == label_len, '{}: {}, {}'.format(
+            folder, label_len, n_frames)
 
 
 def gen_image_npy(video_dirs, target_dir, n_samples):
@@ -131,10 +134,36 @@ def window_generator(npy_dir, batch_size):
             del x_part, y_part
 
 
+def window_generator_online(video_dirs, n_samples, batch_size):
+    windows = []
+    for video_dir in video_dirs:
+        n_frames = len(list((video_dir / 'frames/').iterdir()))
+        label = read_json(video_dir / 'label.json')['label']
+        cur_windows = [(video_dir, t - TIMESTEPS, t, label[t - 1])
+                       for t in range(TIMESTEPS, n_frames)]
+        windows.extend(cur_windows)
+    windows = random.sample(windows, n_samples)
+
+    idx = 0
+    x_batch = np.zeros((batch_size, TIMESTEPS, 224, 224, 3), dtype=np.float32)
+    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
+
+    while True:
+        for video_dir, s, e, label in windows:
+            for i in range(e - s):
+                img_path = video_dir / 'frames' / '{:08d}'.format(s + i)
+                x_batch[idx][i] = read_img(img_path)
+            y_batch[idx] = label
+
+            if idx + 1 == batch_size:
+                yield x_batch, y_batch
+            idx = (idx + 1) % batch_size
+
+
 image_train_gen = image_generator(IMAGE_TRAIN, 40)
 image_val_gen = image_generator(IMAGE_VAL, 40)
-window_train_gen = window_generator(WINDOW_TRAIN, WINDOW_BATCH_SIZE)
-window_val_gen = window_generator(WINDOW_VAL, WINDOW_BATCH_SIZE)
+window_train_gen = window_generator_online(WINDOW_TRAIN, WINDOW_BATCH_SIZE)
+window_val_gen = window_generator_online(WINDOW_VAL, WINDOW_BATCH_SIZE)
 
 if __name__ == '__main__':
     check()
