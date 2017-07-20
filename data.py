@@ -7,6 +7,7 @@ import numpy as np
 from tqdm import tqdm
 from utils import sample, split, read_json, read_img
 from moviepy.editor import VideoFileClip
+import skvideo.io
 
 DATASET = Path('~/dataset/').expanduser()
 DIRS = sorted([x for x in DATASET.iterdir() if x.is_dir()])
@@ -169,6 +170,37 @@ window_train_gen = window_generator(WINDOW_TRAIN, WINDOW_BATCH_SIZE)
 window_val_gen = window_generator(WINDOW_VAL, WINDOW_BATCH_SIZE)
 window_train_gen_online = window_generator_online(TRAIN_DIRS, N_WINDOW_TRAIN, WINDOW_BATCH_SIZE)
 window_val_gen_online = window_generator_online(VAL_DIRS, N_WINDOW_VAL, WINDOW_BATCH_SIZE)
+
+
+def video_gen(video_dirs, n_samples, batch_size):
+    n_samples_per_video = n_samples // len(video_dirs)
+
+    idx = 0
+    x_batch = np.zeros((batch_size, TIMESTEPS, 224, 224, 3), dtype=np.float32)
+    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
+
+    while True:
+        for video_dir in video_dirs:
+            video = skvideo.io.vread(str(video_dir / 'video.mp4'))
+            n_frames = video.shape[0]
+
+            info = read_json(video_dir / 'info.json')
+            label = np.zeros(n_frames, dtype=np.uint8)
+            for s, e in zip(info['starts'], info['ends']):
+                label[s:e] = 1
+
+            windows = [(t - TIMESTEPS, t) for t in range(TIMESTEPS, video.shape[0])]
+            windows = random.sample(windows, n_samples_per_video)
+            for (s, e) in windows:
+                x_batch[idx] = video[s:e]
+                y_batch[idx] = label[e - 1]
+
+                if idx + 1 == batch_size:
+                    yield x_batch, y_batch
+                idx = (idx + 1) % batch_size
+            
+            del video, label, windows
+
 
 if __name__ == '__main__':
     check()
