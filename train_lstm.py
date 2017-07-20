@@ -31,7 +31,6 @@ def main():
         model.add(TimeDistributed(Flatten()))
         model.add(LSTM(10))
         model.add(BatchNormalization())
-        model.add(Flatten())
         model.add(Dense(16))
         model.add(Dropout(0.3))
         model.add(Dense(1, activation='sigmoid'))
