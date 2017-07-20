@@ -51,10 +51,10 @@ def main():
     x_val = np.zeros((n_val, TIMESTEPS, 224, 224, 3), dtype=np.float32)
     y_val = np.zeros((n_val, 1), dtype=np.uint8)
 
-    x_train_npys = sorted(WINDOW_TRAIN.glob('x_*.npy'))[:150]
-    y_train_npys = sorted(WINDOW_TRAIN.glob('y_*.npy'))[:150]
-    x_val_npys = sorted(WINDOW_VAL.globa('x_*.npy'))[:3]
-    y_val_npys = sorted(WINDOW_VAL.globa('y_*.npy'))[:3]
+    x_train_npys = sorted(WINDOW_TRAIN.glob('x_*.npy'))[:n_train // 200]
+    y_train_npys = sorted(WINDOW_TRAIN.glob('y_*.npy'))[:n_train // 200]
+    x_val_npys = sorted(WINDOW_VAL.glob('x_*.npy'))[:n_val // 200]
+    y_val_npys = sorted(WINDOW_VAL.glob('y_*.npy'))[:n_val // 200]
     for i, (x_npy, y_npy) in enumerate(tqdm(zip(x_train_npys, y_train_npys))):
         x_train[i * 200: i * 200 + 200] = np.load(x_npy)
         y_train[i * 200: i * 200 + 200] = np.load(y_npy)
