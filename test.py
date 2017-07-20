@@ -102,6 +102,9 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
+    from keras.utils import plot_model
+    plot_model(model, to_file='model.png')  
+
     dataset = Path('~/tthl-dataset/').expanduser()
     video_dirs = sorted(dataset.glob('video*/'))
 
