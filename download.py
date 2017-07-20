@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from subprocess import run
 
-dataset = Path('~/dataset/').expanduser()
+dataset = Path('~/tthl-dataset/').expanduser()
 video_dirs = [x for x in dataset.iterdir() if x.is_dir()]
 for video_dir in video_dirs:
     url = json.load((video_dir / 'info.json').open())['video_src']
