@@ -49,13 +49,16 @@ def main():
     x_val = np.zeros((n_val, TIMESTEPS, 224, 224, 3), dtype=np.float32)
     y_val = np.zeros((n_val, 1), dtype=np.uint8)
 
+    train_gen = window_generator(WINDOW_TRAIN, 1)
+    val_gen = window_generator(WINDOW_VAL, 1)
+
     print('Loading data...', end='')
     for i in range(n_train):
-        x, y = next(window_train_gen)
+        x, y = next(train_gen)
         x_train[i] = x
         y_train[i] = y
     for i in range(n_val):
-        x, y = next(window_val_gen)
+        x, y = next(val_gen)
         x_val[i] = x
         y_val[i] = y
     print('ok')
