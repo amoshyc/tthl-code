@@ -4,6 +4,7 @@ from pathlib import Path
 from pprint import pprint
 
 import numpy as np
+from scipy.misc import imresize
 from tqdm import tqdm
 from utils import sample, split, read_json, read_img
 from moviepy.editor import VideoFileClip
@@ -196,7 +197,8 @@ def video_gen(video_dirs, n_samples, batch_size):
             windows = [(t - TIMESTEPS, t) for t in range(TIMESTEPS, video.shape[0])]
             windows = random.sample(windows, n_samples_per_video)
             for (s, e) in windows:
-                x_batch[idx] = video[s:e]
+                for i in range(e - s):
+                    x_batch[idx][i] = imresize(video[s + i], (224, 224))
                 y_batch[idx] = label[e - 1]
 
                 if idx + 1 == batch_size:
