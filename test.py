@@ -117,8 +117,8 @@ def main():
     # }
     # model.fit_generator(**fit_gen_arg)
 
-    x_train, y_train = window_data(video_dirs[:3], 100, 10, 5)
-    x_val, y_val = window_data(video_dirs[-1:], 20, 10, 5)
+    x_train, y_train = window_data(video_dirs[:3], 10000, 10, 5)
+    x_val, y_val = window_data(video_dirs[-1:], 2000, 10, 5)
     fit_arg = {
         'x': x_train,
         'y': y_train,
