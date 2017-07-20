@@ -46,7 +46,7 @@ def main():
         'epochs': 30,
         'validation_data': image_val_gen,
         'validation_steps': N_IMAGE_VAL // IMAGE_BATCH_SIZE,
-        'callbacks': get_callbacks('cnn1bn')
+        'callbacks': get_callbacks('cnn')
     }
 
     model.fit_generator(**fit_arg)
