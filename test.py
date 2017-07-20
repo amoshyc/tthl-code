@@ -2,7 +2,8 @@ import json
 import random
 import numpy as np
 import scipy.misc
-from movie.editor import VideoFileClip
+from moviepy.editor import VideoFileClip
+from tqdm import tqdm
 
 
 def sample_windows(video_dirs, n_samples, timesteps, fps):
@@ -10,7 +11,7 @@ def sample_windows(video_dirs, n_samples, timesteps, fps):
     for video_dir in video_dirs:
         video = VideoFileClip(str(video_dir / 'video.mp4'))
         n_frames = int(video.duration) * fps
-        info = json.load((video_dir / 'info.json'))
+        info = json.load((video_dir / 'info.json').open())
 
         label = np.zeros(n_frames, dtype=np.uint8)
         for s, e in zip(info['starts'], info['ends']):
@@ -34,8 +35,8 @@ def window_gen(video_dirs, n_samples, batch_size, timesteps, fps):
 
     for (video, s, e, y) in windows:
         for i in range(e - s):
-            img = video.get_frame((s + i) / fps, dtype=np.float32)
-            x_batch[idx][i] = scipy.misc.resize(img)
+            img = video.get_frame((s + i) / fps)
+            x_batch[idx][i] = scipy.misc.imresize(img, (224, 224))
         y_batch[idx] = y
 
         if idx + 1 == batch_size:
@@ -49,11 +50,11 @@ def window_data(video_dirs, n_samples, timesteps, fps):
     x_all = np.zeros((n_samples, timesteps, 224, 224, 3), dtype=np.float32)
     y_all = np.zeros((n_samples, 1), dtype=np.uint8)
 
-    for idx, (video, s, e, y) in enumerate(windows):
+    for idx, (video, s, e, y) in enumerate(tqdm(windows)):
         for i in range(e - s):
-            img = video.get_frame((s + i) / fps, dtype=np.float32)
-            x_batch[idx][i] = scipy.misc.resize(img)
-        y_batch[idx] = y
+            img = video.get_frame((s + i) / fps)
+            x_all[idx][i] = scipy.misc.imresize(img, (224, 224))
+        y_all[idx] = y
 
     return x_all, y_all
 
@@ -75,25 +76,23 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-from data import *
 from utils import get_callbacks
 
 
 def main():
-    with tf.device('/gpu:3'):
-        model = Sequential()
-        model.add(TimeDistributed(BatchNormalization(), input_shape=(TIMESTEPS, 224, 224, 3)))
-        model.add(TimeDistributed(Conv2D(4, kernel_size=5, strides=3, activation='relu')))
-        model.add(TimeDistributed(Conv2D(8, kernel_size=5, strides=2, activation='relu')))
-        model.add(TimeDistributed(Conv2D(12, kernel_size=3, strides=1, activation='relu')))
-        model.add(TimeDistributed(BatchNormalization()))
-        model.add(TimeDistributed(MaxPooling2D(pool_size=3)))
-        model.add(Conv3D(4, kernel_size=5, strides=1, activation='relu'))
-        model.add(BatchNormalization())
-        model.add(Flatten())
-        model.add(Dense(16))
-        model.add(Dropout(0.3))
-        model.add(Dense(1, activation='sigmoid'))
+    # with tf.device('/gpu:3'):
+    model = Sequential()
+    model.add(TimeDistributed(BatchNormalization(), input_shape=(10, 224, 224, 3)))
+    model.add(TimeDistributed(Conv2D(4, kernel_size=5, strides=3, activation='relu')))
+    model.add(TimeDistributed(Conv2D(8, kernel_size=5, strides=2, activation='relu')))
+    model.add(TimeDistributed(Conv2D(12, kernel_size=3, strides=1, activation='relu')))
+    model.add(TimeDistributed(MaxPooling2D(pool_size=3)))
+    model.add(Conv3D(4, kernel_size=5, strides=1, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Flatten())
+    model.add(Dense(16))
+    model.add(Dropout(0.3))
+    model.add(Dense(1, activation='sigmoid'))
 
     model_arg = {
         'loss': 'binary_crossentropy',
@@ -105,19 +104,29 @@ def main():
 
     dataset = Path('~/tthl-dataset/').expanduser()
     video_dirs = sorted(dataset.glob('video*/'))
-    train_gen = window_gen(video_dirs[:3], 10000, 40, 10, 5)
-    val_gen = window_gen(video_dirs[-1:], 2000, 40, 10, 5)
 
+    # train_gen = window_gen(video_dirs[:3], 1000, 80, 10, 2)
+    # val_gen = window_gen(video_dirs[-1:], 200, 80, 10, 2)
+    # fit_gen_arg = {
+    #     'generator': train_gen,
+    #     'steps_per_epoch': 10000 // 40,
+    #     'epochs': 30,
+    #     'validation_data': val_gen,
+    #     'validation_steps': 1000 // 40,
+    #     'callbacks': get_callbacks('conv3d')
+    # }
+    # model.fit_generator(**fit_gen_arg)
+
+    x_train, y_train = window_data(video_dirs[:3], 100, 10, 5)
+    x_val, y_val = window_data(video_dirs[-1:], 20, 10, 5)
     fit_arg = {
-        'generator': train_gen,
-        'steps_per_epoch': 10000 // 40,
+        'x': x_train,
+        'y': y_train,
+        'batch_size': 80,
         'epochs': 30,
-        'validation_data': val_gen,
-        'validation_steps': 1000 // 40,
-        'callbacks': get_callbacks('conv3d')
+        'validation_data': (x_val, y_val)
     }
-
-    model.fit_generator(**fit_arg)
+    model.fit(**fit_arg)
 
 
 if __name__ == '__main__':
