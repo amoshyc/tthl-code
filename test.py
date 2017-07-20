@@ -45,7 +45,7 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    n_train, n_val = 5000, 1000
+    n_train, n_val = 3000, 600
     x_train = np.zeros((n_train, TIMESTEPS, 224, 224, 3), dtype=np.float32)
     y_train = np.zeros((n_train, 1), dtype=np.uint8)
     x_val = np.zeros((n_val, TIMESTEPS, 224, 224, 3), dtype=np.float32)
