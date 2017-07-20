@@ -11,4 +11,4 @@ path = pathlib.Path('~/dataset/video00/video.mp4').expanduser()
 from moviepy.editor import VideoFileClip
 clip = VideoFileClip(str(path))
 _ = input(':')
-print(frames.duration)
+print(clip.duration, clip.fps)
