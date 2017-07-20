@@ -15,6 +15,8 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
+from tqdm import tqdm
+
 from data import *
 from utils import get_callbacks
 
@@ -52,16 +54,15 @@ def main():
     train_gen = window_generator(WINDOW_TRAIN, 1)
     val_gen = window_generator(WINDOW_VAL, 1)
 
-    print('Loading data...', end='')
-    for i in range(n_train):
+    print('Loading data')
+    for i in tqdm(range(n_train)):
         x, y = next(train_gen)
         x_train[i] = x
         y_train[i] = y
-    for i in range(n_val):
+    for i in tqdm(range(n_val)):
         x, y = next(val_gen)
         x_val[i] = x
         y_val[i] = y
-    print('ok')
 
     fit_arg = {
         'x': x_train,
