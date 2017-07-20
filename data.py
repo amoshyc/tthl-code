@@ -181,13 +181,17 @@ def video_gen(video_dirs, n_samples, batch_size):
 
     while True:
         for video_dir in video_dirs:
-            video = skvideo.io.vread(str(video_dir / 'video.mp4'))
+            video_path = str(video_dir / 'video.mp4')
+            video = skvideo.io.vread(video_path)
             n_frames = video.shape[0]
+            fps = VideoFileClip(video_path).fps
 
             info = read_json(video_dir / 'info.json')
             label = np.zeros(n_frames, dtype=np.uint8)
             for s, e in zip(info['starts'], info['ends']):
-                label[s:e] = 1
+                fs = s * fps
+                fe = e * fps
+                label[fs:fe] = 1
 
             windows = [(t - TIMESTEPS, t) for t in range(TIMESTEPS, video.shape[0])]
             windows = random.sample(windows, n_samples_per_video)
