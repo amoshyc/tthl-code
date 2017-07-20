@@ -29,7 +29,7 @@ def main():
         model.add(TimeDistributed(BatchNormalization()))
         model.add(TimeDistributed(MaxPooling2D(pool_size=3)))
         model.add(TimeDistributed(Flatten()))
-        model.add(LSTM(10))
+        model.add(GRU(10))
         model.add(BatchNormalization())
         model.add(Dense(16))
         model.add(Dropout(0.3))
