@@ -48,10 +48,10 @@ def main():
 
 
     fit_arg = {
-        'generator': video_train(TRAIN_DIRS, n_train, WINDOW_BATCH_SIZE),
+        'generator': video_gen(TRAIN_DIRS, n_train, WINDOW_BATCH_SIZE),
         'steps_per_epoch': n_train // WINDOW_BATCH_SIZE,
         'epochs': 30,
-        'validation_data': video_train(VAL_DIRS, n_val, WINDOW_BATCH_SIZE),
+        'validation_data': video_gen(VAL_DIRS, n_val, WINDOW_BATCH_SIZE),
         'validation_steps': n_val // WINDOW_BATCH_SIZE,
         'callbacks': get_callbacks('conv3d')
     }
