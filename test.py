@@ -45,24 +45,25 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    n_train, n_val = 3000, 600
+    n_train, n_val = 4000, 800
     x_train = np.zeros((n_train, TIMESTEPS, 224, 224, 3), dtype=np.float32)
     y_train = np.zeros((n_train, 1), dtype=np.uint8)
     x_val = np.zeros((n_val, TIMESTEPS, 224, 224, 3), dtype=np.float32)
     y_val = np.zeros((n_val, 1), dtype=np.uint8)
 
-    train_gen = window_generator(WINDOW_TRAIN, 1)
-    val_gen = window_generator(WINDOW_VAL, 1)
+    x_train_npys = sorted(WINDOW_TRAIN.glob('x_*.npy'))[:150]
+    y_train_npys = sorted(WINDOW_TRAIN.glob('y_*.npy'))[:150]
+    x_val_npys = sorted(WINDOW_VAL.globa('x_*.npy'))[:3]
+    y_val_npys = sorted(WINDOW_VAL.globa('y_*.npy'))[:3]
+    for i, (x_npy, y_npy) in enumerate(tqdm(zip(x_train_npys, y_train_npys))):
+        x_train[i * 200: i * 200 + 200] = np.load(x_npy)
+        y_train[i * 200: i * 200 + 200] = np.load(y_npy)
+    for i, (x_npy, y_npy) in enumerate(tqdm(zip(x_val_npys, y_val_npys))):
+        x_val[i * 200: i * 200 + 200] = np.load(x_npy)
+        y_val[i * 200: i * 200 + 200] = np.load(y_npy)
 
-    print('Loading data')
-    for i in tqdm(range(n_train)):
-        x, y = next(train_gen)
-        x_train[i] = x
-        y_train[i] = y
-    for i in tqdm(range(n_val)):
-        x, y = next(val_gen)
-        x_val[i] = x
-        y_val[i] = y
+    
+    
 
     fit_arg = {
         'x': x_train,
