@@ -189,8 +189,8 @@ def video_gen(video_dirs, n_samples, batch_size):
             info = read_json(video_dir / 'info.json')
             label = np.zeros(n_frames, dtype=np.uint8)
             for s, e in zip(info['starts'], info['ends']):
-                fs = s * fps
-                fe = e * fps
+                fs = round(s * fps)
+                fe = round(e * fps)
                 label[fs:fe] = 1
 
             windows = [(t - TIMESTEPS, t) for t in range(TIMESTEPS, video.shape[0])]
