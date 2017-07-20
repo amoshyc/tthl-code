@@ -1,4 +1,64 @@
 import json
+import random
+import numpy as np
+import scipy.misc
+from movie.editor import VideoFileClip
+
+
+def sample_windows(video_dirs, n_samples, timesteps, fps):
+    windows = []
+    for video_dir in video_dirs:
+        video = VideoFileClip(str(video_dir / 'video.mp4'))
+        n_frames = int(video.duration) * fps
+        info = json.load((video_dir / 'info.json'))
+
+        label = np.zeros(n_frames, dtype=np.uint8)
+        for s, e in zip(info['starts'], info['ends']):
+            fs = round(s * fps)
+            fe = round(e * fps)
+            label[fs:fe] = 1
+
+        cur = [(video, t - timesteps, t, label[t - 1])
+               for t in range(timesteps, n_frames)]
+        windows.extend(cur)
+
+    return random.sample(windows, k=n_samples)
+
+
+def window_gen(video_dirs, n_samples, batch_size, timesteps, fps):
+    windows = sample_windows(video_dirs, n_samples, timesteps, fps)
+
+    idx = 0
+    x_batch = np.zeros((batch_size, timesteps, 224, 224, 3), dtype=np.float32)
+    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
+
+    for (video, s, e, y) in windows:
+        for i in range(e - s):
+            img = video.get_frame((s + i) / fps, dtype=np.float32)
+            x_batch[idx][i] = scipy.misc.resize(img)
+        y_batch[idx] = y
+
+        if idx + 1 == batch_size:
+            yield x_batch, y_batch
+        idx = (idx + 1) % batch_size
+
+
+def window_data(video_dirs, n_samples, timesteps, fps):
+    windows = sample_windows(video_dirs, n_samples, timesteps, fps)
+
+    x_all = np.zeros((n_samples, timesteps, 224, 224, 3), dtype=np.float32)
+    y_all = np.zeros((n_samples, 1), dtype=np.uint8)
+
+    for idx, (video, s, e, y) in enumerate(windows):
+        for i in range(e - s):
+            img = video.get_frame((s + i) / fps, dtype=np.float32)
+            x_batch[idx][i] = scipy.misc.resize(img)
+        y_batch[idx] = y
+
+    return x_all, y_all
+
+
+import json
 from pathlib import Path
 
 import numpy as np
@@ -43,16 +103,17 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    n_train = 10000
-    n_val = 2000
-
+    dataset = Path('~/tthl-dataset/').expanduser()
+    video_dirs = sorted(dataset.glob('video*/'))
+    train_gen = window_gen(video_dirs[:3], 10000, 40, 10, 5)
+    val_gen = window_gen(video_dirs[-1:], 2000, 40, 10, 5)
 
     fit_arg = {
-        'generator': video_gen(TRAIN_DIRS, n_train, WINDOW_BATCH_SIZE),
-        'steps_per_epoch': n_train // WINDOW_BATCH_SIZE,
+        'generator': train_gen,
+        'steps_per_epoch': 10000 // 40,
         'epochs': 30,
-        'validation_data': video_gen(VAL_DIRS, n_val, WINDOW_BATCH_SIZE),
-        'validation_steps': n_val // WINDOW_BATCH_SIZE,
+        'validation_data': val_gen,
+        'validation_steps': 1000 // 40,
         'callbacks': get_callbacks('conv3d')
     }
 
