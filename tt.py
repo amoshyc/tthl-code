@@ -58,16 +58,17 @@ class WindowNpyGenerator(object):
             np.savez(npz_path, xs=xs, ys=ys)
 
     def fit(self, video_dirs):
+        from pprint import pprint
         train, val = [], []
         for video_dir in video_dirs:
             windows = self.extract_windows(video_dir)
+            print(video_dir)
+            pprint(windows)
             random.shuffle(windows)
             pivot = round((self.n_train) / (self.n_train + self.n_val) * len(windows))
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
 
-        print(len(train), self.n_train)
-        print(len(val), self.n_val)
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
 
