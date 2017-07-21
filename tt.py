@@ -37,8 +37,7 @@ class WindowNpyGenerator(object):
             label[fs:fe + 1] = 1
 
         windows = [(video, f - timesteps, f, label[f - 1])
-                   for f in range(timesteps, n_frames, n_frames - overlap)]
-        print(video_dir, len(windows))
+                   for f in range(timesteps, n_frames, timesteps - overlap)]
         return windows
 
     def gen_npz(self, windows, chunk_size=10000):
