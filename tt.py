@@ -67,7 +67,12 @@ class WindowNpyGenerator(object):
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
 
-            print(video_dir, len(windows))
+        if len(train) < n_train:
+            print('Not enough train data: {} < {}'.format(len(train), n_train))
+            return
+        if len(val) < n_val:
+            print('Not enough val data: {} < {}'.format(len(val), n_val))
+            return
 
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
@@ -98,7 +103,7 @@ def main():
     dataset = Path('~/tthl-dataset/').expanduser()
     video_dirs = sorted(dataset.glob('video*/'))
 
-    gen = WindowNpyGenerator(n_train=10000, n_val=2000, fps=1, timesteps=2, overlap=1)
+    gen = WindowNpyGenerator(n_train=10000, n_val=2000, fps=3, timesteps=2, overlap=1)
     gen.fit(video_dirs)
 
 
