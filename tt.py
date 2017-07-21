@@ -30,6 +30,8 @@ class WindowNpyGenerator(object):
         timesteps = self.timesteps
         overlap = self.overlap
 
+        print(video_dir, n_frames, timesteps, overlap)
+
         label = np.zeros(n_frames, dtype=np.uint8)
         for s, e in zip(info['starts'], info['ends']):
             fs = round(s * self.fps)
@@ -58,12 +60,9 @@ class WindowNpyGenerator(object):
             np.savez(npz_path, xs=xs, ys=ys)
 
     def fit(self, video_dirs):
-        from pprint import pprint
         train, val = [], []
         for video_dir in video_dirs:
             windows = self.extract_windows(video_dir)
-            print(video_dir)
-            pprint(windows)
             random.shuffle(windows)
             pivot = round((self.n_train) / (self.n_train + self.n_val) * len(windows))
             train.extend(windows[:pivot])
