@@ -21,7 +21,7 @@ class WindowNpyGenerator(object):
         self.fps = fps
         self.timesteps = timesteps
         self.overlap = overlap
-        self.target_dir = target_dir or Path('./npy/')
+        self.target_dir = target_dir or Path('./npz/')
 
     def extract_windows(self, video_dir):
         video = VideoFileClip(str(video_dir / 'video.mp4'))
@@ -54,7 +54,7 @@ class WindowNpyGenerator(object):
                     xs[i][j] = scipy.misc.imresize(img, (224, 224))
                 ys[i] = y
 
-            npz_path = self.target_dir / '{:04d}.npy'.format(idx // chunk_size)
+            npz_path = self.target_dir / '{:04d}.npz'.format(idx // chunk_size)
             np.savez(npz_path, xs=xs, ys=ys)
 
     def fit(self, video_dirs):
@@ -62,7 +62,8 @@ class WindowNpyGenerator(object):
         for video_dir in video_dirs:
             windows = self.extract_windows(video_dir)
             random.shuffle(windows)
-            pivot = round((self.n_train) / (self.n_train + self.n_val) * len(windows))
+            pivot = round(
+                (self.n_train) / (self.n_train + self.n_val) * len(windows))
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
 
@@ -95,8 +96,8 @@ def main():
     dataset = Path('~/tthl-dataset/').expanduser()
     video_dirs = sorted(dataset.glob('video*/'))
 
-    gen = WindowNpyGenerator()
-    gen.fit(video_dirs[:3])
+    gen = WindowNpyGenerator(n_train=10000, n_val=2000, fps=1, timesteps=2, overlap=1)
+    gen.fit(video_dirs[:-1])
 
 
 if __name__ == '__main__':
