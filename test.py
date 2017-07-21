@@ -112,10 +112,10 @@ def main():
 
     fit_gen_arg = {
         'generator': gen.flow('train', 80),
-        'steps_per_epoch': 10000 // 40,
+        'steps_per_epoch': 10000 // 80,
         'epochs': 30,
         'validation_data': gen.flow('val', 80),
-        'validation_steps': 1000 // 40,
+        'validation_steps': 2000 // 80,
         'callbacks': get_callbacks('conv3d')
     }
     model.fit_generator(**fit_gen_arg)
