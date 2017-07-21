@@ -40,7 +40,7 @@ class WindowNpyGenerator(object):
                    for f in range(timesteps, n_frames, timesteps - overlap)]
         return windows
 
-    def gen_npz(self, windows, chunk_size=10000):
+    def gen_npz(self, windows, name, chunk_size=10000):
         for idx in tqdm(range(0, len(windows), chunk_size), desc='  chunk'):
             chunk_s, chunk_e = idx, min(idx + chunk_size, len(windows))
             chunk = windows[chunk_s:chunk_e]
@@ -54,7 +54,7 @@ class WindowNpyGenerator(object):
                     xs[i][j] = scipy.misc.imresize(img, (224, 224))
                 ys[i] = y
 
-            npz_path = self.target_dir / '{:04d}.npz'.format(idx // chunk_size)
+            npz_path = self.target_dir / '{}{:04d}.npz'.format(name, idx // chunk_size)
             np.savez(npz_path, xs=xs, ys=ys)
 
     def fit(self, video_dirs):
@@ -80,11 +80,11 @@ class WindowNpyGenerator(object):
         val = random.sample(val, k=self.n_val)
 
         self.target_dir.mkdir(exist_ok=True)
-        self.gen_npz(train)
-        self.gen_npz(val)
+        self.gen_npz(train, 'train')
+        self.gen_npz(val, 'val')
 
-    def flow(self, batch_size=80):
-        npzs = sorted(self.target_dir.glob('*.npz'))
+    def flow(self, name, batch_size=80):
+        npzs = sorted(self.target_dir.glob('{}*.npz'.format(name)))
 
         idx = 0
         x_batch = np.zeros(

@@ -76,6 +76,7 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
+from tt import WindowNpyGenerator
 from utils import get_callbacks
 
 
@@ -106,28 +107,29 @@ def main():
     dataset = Path('~/tthl-dataset/').expanduser()
     video_dirs = sorted(dataset.glob('video*/'))
 
-    # train_gen = window_gen(video_dirs[:3], 1000, 80, 10, 2)
-    # val_gen = window_gen(video_dirs[-1:], 200, 80, 10, 2)
-    # fit_gen_arg = {
-    #     'generator': train_gen,
-    #     'steps_per_epoch': 10000 // 40,
-    #     'epochs': 30,
-    #     'validation_data': val_gen,
-    #     'validation_steps': 1000 // 40,
-    #     'callbacks': get_callbacks('conv3d')
-    # }
-    # model.fit_generator(**fit_gen_arg)
+    gen = WindowNpyGenerator(n_train=10000, n_val=2000, fps=3, timesteps=6, overlap=1)
+    gen.fit(video_dirs)
 
-    x_train, y_train = window_data(video_dirs[:3], 5000, 10, 5)
-    x_val, y_val = window_data(video_dirs[-1:], 1000, 10, 5)
-    fit_arg = {
-        'x': x_train,
-        'y': y_train,
-        'batch_size': 80,
+    fit_gen_arg = {
+        'generator': gen.flow('train', 80),
+        'steps_per_epoch': 10000 // 40,
         'epochs': 30,
-        'validation_data': (x_val, y_val)
+        'validation_data': gen.flow('val, 80),
+        'validation_steps': 1000 // 40,
+        'callbacks': get_callbacks('conv3d')
     }
-    model.fit(**fit_arg)
+    model.fit_generator(**fit_gen_arg)
+
+    # x_train, y_train = window_data(video_dirs[:3], 5000, 10, 5)
+    # x_val, y_val = window_data(video_dirs[-1:], 1000, 10, 5)
+    # fit_arg = {
+    #     'x': x_train,
+    #     'y': y_train,
+    #     'batch_size': 80,
+    #     'epochs': 30,
+    #     'validation_data': (x_val, y_val)
+    # }
+    # model.fit(**fit_arg)
 
 
 if __name__ == '__main__':
