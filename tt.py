@@ -67,6 +67,8 @@ class WindowNpyGenerator(object):
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
 
+            print(video_dir, len(windows))
+
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
 
@@ -97,7 +99,7 @@ def main():
     video_dirs = sorted(dataset.glob('video*/'))
 
     gen = WindowNpyGenerator(n_train=10000, n_val=2000, fps=1, timesteps=2, overlap=1)
-    gen.fit(video_dirs[:-1])
+    gen.fit(video_dirs)
 
 
 if __name__ == '__main__':
