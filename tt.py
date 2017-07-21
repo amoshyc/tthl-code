@@ -41,7 +41,7 @@ class WindowNpyGenerator(object):
         return windows
 
     def gen_npz(self, windows, name, chunk_size=10000):
-        for idx in tqdm(range(0, len(windows), chunk_size), desc='  chunk'):
+        for idx in tqdm(range(0, len(windows), chunk_size), desc=' chunks'):
             chunk_s, chunk_e = idx, min(idx + chunk_size, len(windows))
             chunk = windows[chunk_s:chunk_e]
 
