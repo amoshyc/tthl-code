@@ -48,7 +48,7 @@ class WindowNpyGenerator(object):
             n = len(chunk)
             xs = np.zeros((n, self.timesteps, 224, 224, 3), dtype=np.float32)
             ys = np.zeros(n, dtype=np.uint8)
-            for i, (video, s, e, y) in enumerate(tqdm(chunk), desc='data'):
+            for i, (video, s, e, y) in enumerate(tqdm(chunk, desc='data')):
                 for j in range(e - s):
                     img = video.get_frame((s + j) / self.fps)
                     xs[i][j] = scipy.misc.imresize(img, (224, 224))
