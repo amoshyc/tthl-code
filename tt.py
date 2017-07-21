@@ -62,7 +62,7 @@ class WindowNpyGenerator(object):
         for video_dir in video_dirs:
             windows = self.extract_windows(video_dir)
             random.shuffle(windows)
-            pivot = (self.n_train) / (self.n_train + self.n_val) * len(windows)
+            pivot = round((self.n_train) / (self.n_train + self.n_val) * len(windows))
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
 
