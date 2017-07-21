@@ -69,10 +69,10 @@ class WindowNpyGenerator(object):
 
             print(video_dir, len(windows))
 
-        if len(train) < n_train:
+        if len(train) < self.n_train:
             print('Not enough train data')
             return
-        if len(val) < n_val:
+        if len(val) < self.n_val:
             print('Not enough val data')
             return
 
