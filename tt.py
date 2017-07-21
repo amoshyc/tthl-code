@@ -41,14 +41,14 @@ class WindowNpyGenerator(object):
         return windows
 
     def gen_npz(self, windows, chunk_size=10000):
-        for idx in tqdm(range(0, len(windows), chunk_size), desc='chunk'):
+        for idx in tqdm(range(0, len(windows), chunk_size), desc='  chunk'):
             chunk_s, chunk_e = idx, min(idx + chunk_size, len(windows))
             chunk = windows[chunk_s:chunk_e]
 
             n = len(chunk)
             xs = np.zeros((n, self.timesteps, 224, 224, 3), dtype=np.float32)
             ys = np.zeros(n, dtype=np.uint8)
-            for i, (video, s, e, y) in enumerate(tqdm(chunk, desc='data')):
+            for i, (video, s, e, y) in enumerate(tqdm(chunk, desc='windows')):
                 for j in range(e - s):
                     img = video.get_frame((s + j) / self.fps)
                     xs[i][j] = scipy.misc.imresize(img, (224, 224))
