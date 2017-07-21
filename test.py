@@ -88,7 +88,7 @@ def main():
     model.add(TimeDistributed(Conv2D(8, kernel_size=5, strides=2, activation='relu')))
     model.add(TimeDistributed(Conv2D(12, kernel_size=3, strides=1, activation='relu')))
     model.add(TimeDistributed(MaxPooling2D(pool_size=3)))
-    model.add(Conv3D(4, kernel_size=5, strides=1, activation='relu'))
+    model.add(Conv3D(4, kernel_size=4, strides=1, activation='relu'))
     model.add(BatchNormalization())
     model.add(Flatten())
     model.add(Dense(16))
