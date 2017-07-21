@@ -66,6 +66,8 @@ class WindowNpyGenerator(object):
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
 
+        print(len(train), self.n_train)
+        print(len(val), self.n_val)
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
 
