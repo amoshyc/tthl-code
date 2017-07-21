@@ -54,7 +54,7 @@ class WindowNpyGenerator(object):
                     xs[i][j] = scipy.misc.imresize(img, (224, 224))
                 ys[i] = y
 
-            npz_path = self.target_dir / '{}{:04d}.npz'.format(name, idx // chunk_size)
+            npz_path = self.target_dir / '{}{:04d}'.format(name, idx // chunk_size)
             np.savez(npz_path, xs=xs, ys=ys)
 
     def fit(self, video_dirs):
@@ -102,6 +102,7 @@ class WindowNpyGenerator(object):
                     if idx + 1 == batch_size:
                         yield x_batch, y_batch
                     idx = (idx + 1) % batch_size
+                del data
 
 
 def main():

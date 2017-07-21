@@ -110,26 +110,29 @@ def main():
     gen = WindowNpyGenerator(n_train=10000, n_val=2000, fps=2, timesteps=4, overlap=3)
     # gen.fit(video_dirs)
 
-    fit_gen_arg = {
-        'generator': gen.flow('train', 80),
-        'steps_per_epoch': 10000 // 80,
-        'epochs': 30,
-        'validation_data': gen.flow('val', 80),
-        'validation_steps': 2000 // 80,
-        'callbacks': get_callbacks('conv3d')
-    }
-    model.fit_generator(**fit_gen_arg)
-
-    # x_train, y_train = window_data(video_dirs[:3], 5000, 10, 5)
-    # x_val, y_val = window_data(video_dirs[-1:], 1000, 10, 5)
-    # fit_arg = {
-    #     'x': x_train,
-    #     'y': y_train,
-    #     'batch_size': 80,
+    # fit_gen_arg = {
+    #     'generator': gen.flow('train', 80),
+    #     'steps_per_epoch': 10000 // 80,
     #     'epochs': 30,
-    #     'validation_data': (x_val, y_val)
+    #     'validation_data': gen.flow('val', 80),
+    #     'validation_steps': 2000 // 80,
+    #     'callbacks': get_callbacks('conv3d')
     # }
-    # model.fit(**fit_arg)
+    # model.fit_generator(**fit_gen_arg)
+
+    train_data = np.load('npz/train0000.npz')
+    x_train, y_train = train_data['xs'], train_data['ys']
+    val_data = np.load('npz/val0000.npz')
+    x_val, y_val = val_data['xs'], val_data['ys']
+    
+    fit_arg = {
+        'x': x_train,
+        'y': y_train,
+        'batch_size': 80,
+        'epochs': 30,
+        'validation_data': (x_val, y_val)
+    }
+    model.fit(**fit_arg)
 
 
 if __name__ == '__main__':
