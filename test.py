@@ -124,13 +124,15 @@ def main():
     x_train, y_train = train_data['xs'], train_data['ys']
     val_data = np.load('npz/val0000.npz')
     x_val, y_val = val_data['xs'], val_data['ys']
-    
+
     fit_arg = {
         'x': x_train,
         'y': y_train,
-        'batch_size': 80,
+        'batch_size': 100,
         'epochs': 30,
-        'validation_data': (x_val, y_val)
+        'shuffle': True,
+        'validation_data': (x_val, y_val),
+        'callbacks': get_callbacks('conv3d')
     }
     model.fit(**fit_arg)
 
