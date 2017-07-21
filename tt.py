@@ -67,11 +67,13 @@ class WindowNpyGenerator(object):
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
 
+            print(video_dir, len(windows))
+
         if len(train) < n_train:
-            print('Not enough train data: {} < {}'.format(len(train), n_train))
+            print('Not enough train data')
             return
         if len(val) < n_val:
-            print('Not enough val data: {} < {}'.format(len(val), n_val))
+            print('Not enough val data')
             return
 
         train = random.sample(train, k=self.n_train)
