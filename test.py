@@ -114,7 +114,7 @@ def main():
         'generator': gen.flow('train', 80),
         'steps_per_epoch': 10000 // 40,
         'epochs': 30,
-        'validation_data': gen.flow('val, 80),
+        'validation_data': gen.flow('val', 80),
         'validation_steps': 1000 // 40,
         'callbacks': get_callbacks('conv3d')
     }
