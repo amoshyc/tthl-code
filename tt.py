@@ -6,17 +6,24 @@ import scipy.misc
 from moviepy.editor import VideoFileClip
 from tqdm import tqdm
 
+
 class WindowNpyGenerator(object):
-    def __init__(self, n_train=None, n_val=None, fps=1, timesteps=5, overlap=4, target_dir=None):
+    def __init__(self,
+                 n_train=None,
+                 n_val=None,
+                 fps=1,
+                 timesteps=5,
+                 overlap=4,
+                 target_dir=None):
         self.video_dirs = []
         self.n_train = n_train or 100
         self.n_val = n_val or 20
         self.fps = fps
         self.timesteps = timesteps
         self.overlap = overlap
-        self.target_dir = target_dir or Path('./npy/') 
+        self.target_dir = target_dir or Path('./npy/')
 
-    def extract_windows(video_dir):
+    def extract_windows(self, video_dir):
         video = VideoFileClip(str(video_dir / 'video.mp4'))
         info = json.load((video_dir / 'info.json').open())
         n_frames = int(video.duration) * self.fps
@@ -25,41 +32,43 @@ class WindowNpyGenerator(object):
 
         label = np.zeros(n_frames, dtype=np.uint8)
         for s, e in zip(info['starts'], info['ends']):
-            fs = round(s * fps)
-            fe = round(e * fps)
+            fs = round(s * self.fps)
+            fe = round(e * self.fps)
             label[fs:fe + 1] = 1
 
         windows = [(video, f - timesteps, f, label[f - 1])
-                for f in range(timesteps, n_frames, n_frames - overlap)]
+                   for f in range(timesteps, n_frames, n_frames - overlap)]
         return windows
 
-    def gen_npz(self, windows, chunk_size=10000):  
-        for i in tqdm(range(0, len(windows), chunk_size), desc='chunk'):
-            chunk_s, chunk_e = i, min(i + chunk_size, len(windows))
+    def gen_npz(self, windows, chunk_size=10000):
+        for idx in tqdm(range(0, len(windows), chunk_size), desc='chunk'):
+            chunk_s, chunk_e = idx, min(idx + chunk_size, len(windows))
             chunk = windows[chunk_s:chunk_e]
 
-            xs = np.zeros((len(chunk), self.timesteps, 224, 224, 3), dtype=np.float32)
-            ys = np.zeros(len(chunk), dtype=np.uint8)
+            n = len(chunk)
+            xs = np.zeros((n, self.timesteps, 224, 224, 3), dtype=np.float32)
+            ys = np.zeros(n, dtype=np.uint8)
             for i, (video, s, e, y) in enumerate(tqdm(chunk), desc='data'):
                 for j in range(e - s):
-                    img = video.get_frame((s + j) / fps)
+                    img = video.get_frame((s + j) / self.fps)
                     xs[i][j] = scipy.misc.imresize(img, (224, 224))
                 ys[i] = y
 
-            npz_path = self.target_dir / '{:04d}.npy'.format(i // chunk_size)
+            npz_path = self.target_dir / '{:04d}.npy'.format(idx // chunk_size)
             np.savez(npz_path, xs=xs, ys=ys)
 
     def fit(self, video_dirs):
+        train, val = [], []
         for video_dir in video_dirs:
             windows = self.extract_windows(video_dir)
             random.shuffle(windows)
             pivot = (self.n_train) / (self.n_train + self.n_val) * len(windows)
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
-        
+
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
-        
+
         self.target_dir.mkdir(exist_ok=True)
         self.gen_npz(train)
         self.gen_npz(val)
@@ -68,7 +77,8 @@ class WindowNpyGenerator(object):
         npzs = sorted(self.target_dir.glob('*.npz'))
 
         idx = 0
-        x_batch = np.zeros((batch_size, self.timesteps, 224, 224, 3), dtype=np.float32)
+        x_batch = np.zeros(
+            (batch_size, self.timesteps, 224, 224, 3), dtype=np.float32)
         y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
 
         while True:
@@ -81,9 +91,13 @@ class WindowNpyGenerator(object):
                     idx = (idx + 1) % batch_size
 
 
-if __name__ == '__main__':
+def main():
     dataset = Path('~/tthl-dataset/').expanduser()
     video_dirs = sorted(dataset.glob('video*/'))
 
     gen = WindowNpyGenerator()
-    gen.fit(video_dirs[:3]) 
+    gen.fit(video_dirs[:3])
+
+
+if __name__ == '__main__':
+    main()
