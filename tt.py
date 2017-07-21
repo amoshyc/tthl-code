@@ -93,7 +93,10 @@ class WindowNpyGenerator(object):
 
         while True:
             for npz in npzs:
-                for x, y in zip(npz['xs'], npz['ys']):
+                data = np.load(npz)
+                xs = data['xs']
+                ys = data['ys']
+                for x, y in zip(xs, ys):
                     x_batch[idx] = x
                     y_batch[idx] = y
                     if idx + 1 == batch_size:
