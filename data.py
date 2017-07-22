@@ -44,6 +44,7 @@ class ImageNpzCreator(object):
 
         npz_path = self.target_dir / '{}.npz'.format(name)
         np.savez(npz_path, xs=xs, ys=ys)
+        del xs, ys
 
     def fit(self, video_dirs):
         train, val = [], []
@@ -109,6 +110,7 @@ class WindowNpzCreator(object):
 
         npz_path = self.target_dir / '{}.npz'.format(name)
         np.savez(npz_path, xs=xs, ys=ys)
+        del xs, ys
 
     def fit(self, video_dirs):
         train, val = [], []
@@ -126,8 +128,8 @@ class WindowNpzCreator(object):
         val = random.sample(val, k=self.n_val)
 
         self.target_dir.mkdir(exist_ok=True, parents=True)
-        self.gen_npz(train, 'train')
-        self.gen_npz(val, 'val')
+        self.gen_npz(train, 'window_train')
+        self.gen_npz(val, 'window_val')
 
 
 def main():
