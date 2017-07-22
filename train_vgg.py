@@ -14,6 +14,7 @@ from keras.models import Sequential, Model
 from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
+from keras.applications.vgg16 import VGG16
 
 from utils import get_callbacks
 
