@@ -51,9 +51,9 @@ def main():
         'y': y_train,
         'batch_size': 100,
         'epochs': 50,
-        'shuffle': True,
+        # 'shuffle': True,
         'validation_data': (x_val, y_val),
-        'callbacks': get_callbacks('cnn')
+        'callbacks': get_callbacks('cnn'),
     }
     model.fit(**fit_arg)
 
