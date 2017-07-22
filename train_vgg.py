@@ -23,10 +23,7 @@ def main():
     with tf.device('/gpu:2'):
         vgg = VGG16(weights='imagenet', include_top=False, pooling='max')
         x = vgg.output
-        x = BatchNormalization()(x)
         x = Dense(16, activation='relu')(x)
-        x = Dropout(0.5)(x)
-        x = Dense(8, activation='relu')(x)
         x = Dropout(0.5)(x)
         x = Dense(1, activation='sigmoid')(x)
         model = Model(inputs=vgg.input, outputs=x)
