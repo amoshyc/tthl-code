@@ -1,225 +1,146 @@
 import json
 import random
 from pathlib import Path
-from pprint import pprint
-
 import numpy as np
-from scipy.misc import imresize
-from tqdm import tqdm
-from utils import sample, split, read_json, read_img
+import scipy.misc
 from moviepy.editor import VideoFileClip
-import skvideo.io
-
-DATASET = Path('~/dataset/').expanduser()
-DIRS = sorted([x for x in DATASET.iterdir() if x.is_dir()])
-
-TRAIN_DIRS = DIRS[:-1]
-VAL_DIRS = DIRS[-1:]
-
-IMAGE_TRAIN = Path('npy/image_train')
-IMAGE_VAL = Path('npy/image_val')
-WINDOW_TRAIN = Path('npy/window_train')
-WINDOW_VAL = Path('npy/window_val')
-
-N_IMAGE_TRAIN = 25000
-N_IMAGE_VAL = 5000
-N_WINDOW_TRAIN = 25000
-N_WINDOW_VAL = 5000
-TIMESTEPS = 30
-
-IMAGE_BATCH_SIZE = 40
-WINDOW_BATCH_SIZE = 30    
+from tqdm import tqdm
 
 
-def check():
-    for folder in DIRS:
-        label = read_json(folder / 'label.json')['label']
-        label_len = len(label)
-        n_frames = len(list((folder / 'frames/').iterdir()))
-        assert n_frames == label_len, '{}: {}, {}'.format(
-            folder, label_len, n_frames)
+class ImageNpzCreator(object):
+    '''Create `image_train.npz`, `image_val.npz` at target_dir from image extracted from video_dirs
+    '''
 
+    def __init__(self, n_train=100, n_val=20, fps=1,
+                 target_dir=Path('./npz/')):
+        self.n_train = n_train
+        self.n_val = n_val
+        self.fps = fps
+        self.target_dir = target_dir
 
-def gen_image_npy(video_dirs, target_dir, n_samples):
-    x_all = []
-    y_all = []
-    for video_dir in video_dirs:
-        imgs = sorted((video_dir / 'frames/').iterdir())
-        label = json.load((video_dir / 'label.json').open())['label']
-        x_all.extend(imgs)
-        y_all.extend(label)
+    def extract_data(self, video_dir):
+        video = VideoFileClip(str(video_dir / 'video.mp4'))
+        info = json.load((video_dir / 'info.json').open())
+        n_frames = int(video.duration) * self.fps
 
-    x_use, y_use = sample(x_all, y_all, k=n_samples)
+        label = np.zeros(n_frames, dtype=np.uint8)
+        for s, e in zip(info['starts'], info['ends']):
+            fs = round(s * self.fps)
+            fe = round(e * self.fps)
+            label[fs:fe + 1] = 1
 
-    parts = split(x_use, y_use, k=1000)
-    for idx, x_part, y_part in tqdm(parts):
-        n = len(x_part)
+        data = [(video, f, label[f]) for f in range(n_frames)]
+        return data
+
+    def gen_npz(self, data, name):
+        n = len(data)
         xs = np.zeros((n, 224, 224, 3), dtype=np.float32)
         ys = np.zeros((n, 1), dtype=np.uint8)
-        for i in range(n):
-            xs[i] = read_img(x_part[i])
-            ys[i] = y_part[i]
-        np.save(str(target_dir / 'x_{:05d}.npy'.format(idx)), xs)
-        np.save(str(target_dir / 'y_{:05d}.npy'.format(idx)), ys)
-        del xs, ys
 
+        for i, (video, f, y) in enumerate(tqdm(data)):
+            img = video.get_frame(f / self.fps)
+            xs[i] = scipy.misc.imresize(img, (224, 224))
+            ys[i] = y
 
-def gen_window_npy(video_dirs, target_dir, n_samples):
-    x_all = []
-    y_all = []
-    for video_dir in video_dirs:
-        n_frames = len(list((video_dir / 'frames/').iterdir()))
-        labels = read_json(video_dir / 'label.json')['label']
-        windows = [(video_dir, i, i + TIMESTEPS)
-                   for i in range(n_frames - TIMESTEPS)]
-        x_all.extend(windows)
-        y_all.extend([labels[e - 1] for (_, s, e) in windows])
+        npz_path = self.target_dir / '{}.npz'.format(name)
+        np.savez(npz_path, xs=xs, ys=ys)
 
-    x_use, y_use = sample(x_all, y_all, k=n_samples)
-
-    parts = split(x_use, y_use, k=200)
-    for idx, x_part, y_part in tqdm(parts):
-        n = len(x_part)
-        xs = np.zeros((n, TIMESTEPS, 224, 224, 3), dtype=np.float32)
-        ys = np.zeros((n, 1), dtype=np.uint8)
-        for i in range(n):
-            (video_dir, s, e) = x_part[i]
-            for f in range(s, e):
-                path = video_dir / 'frames' / '{:08d}.jpg'.format(f)
-                xs[i][f - s] = read_img(path)
-            ys[i] = y_part[i]
-
-        np.save(str(target_dir / 'x_{:05d}.npy'.format(idx)), xs)
-        np.save(str(target_dir / 'y_{:05d}.npy'.format(idx)), ys)
-        del xs, ys
-
-
-def image_generator(npy_dir, batch_size):
-    x_paths = sorted(npy_dir.glob('x_*.npy'))
-    y_paths = sorted(npy_dir.glob('y_*.npy'))
-
-    idx = 0
-    x_batch = np.zeros((batch_size, 224, 224, 3), dtype=np.float32)
-    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
-
-    while True:
-        for x_path, y_path in zip(x_paths, y_paths):
-            x_part = np.load(x_path)
-            y_part = np.load(y_path)
-            for x, y in zip(x_part, y_part):
-                x_batch[idx] = x
-                y_batch[idx] = y
-                if idx + 1 == batch_size:
-                    yield x_batch, y_batch
-                idx = (idx + 1) % batch_size
-            del x_part, y_part
-
-
-def window_generator(npy_dir, batch_size):
-    x_paths = sorted(npy_dir.glob('x_*.npy'))
-    y_paths = sorted(npy_dir.glob('y_*.npy'))
-
-    idx = 0
-    x_batch = np.zeros((batch_size, TIMESTEPS, 224, 224, 3), dtype=np.float32)
-    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
-
-    while True:
-        for x_path, y_path in zip(x_paths, y_paths):
-            x_part = np.load(x_path)
-            y_part = np.load(y_path)
-            for x, y in zip(x_part, y_part):
-                x_batch[idx] = x
-                y_batch[idx] = y
-                if idx + 1 == batch_size:
-                    yield x_batch, y_batch
-                idx = (idx + 1) % batch_size
-            del x_part, y_part
-
-
-def window_generator_online(video_dirs, n_samples, batch_size):
-    x_all = []
-    y_all = []
-    for video_dir in video_dirs:
-        n_frames = len(list((video_dir / 'frames/').iterdir()))
-        labels = read_json(video_dir / 'label.json')['label']
-        windows = [(video_dir, i, i + TIMESTEPS)
-                   for i in range(n_frames - TIMESTEPS)]
-        x_all.extend(windows)
-        y_all.extend([labels[e - 1] for (_, s, e) in windows])
-
-    x_use, y_use = sample(x_all, y_all, k=n_samples)
-
-    idx = 0
-    x_batch = np.zeros((batch_size, TIMESTEPS, 224, 224, 3), dtype=np.float32)
-    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
-
-    while True: 
-        for (video_dir, s, e), (label) in zip(x_use, y_use):
-            for i in range(e - s):
-                img_path = video_dir / 'frames' / '{:08d}.jpg'.format(s + i)
-                x_batch[idx][i] = read_img(img_path)
-            y_batch[idx] = label
-
-            if idx + 1 == batch_size:
-                yield x_batch, y_batch
-            idx = (idx + 1) % batch_size
-
-
-image_train_gen = image_generator(IMAGE_TRAIN, 40)
-image_val_gen = image_generator(IMAGE_VAL, 40)
-window_train_gen = window_generator(WINDOW_TRAIN, WINDOW_BATCH_SIZE)
-window_val_gen = window_generator(WINDOW_VAL, WINDOW_BATCH_SIZE)
-window_train_gen_online = window_generator_online(TRAIN_DIRS, N_WINDOW_TRAIN, WINDOW_BATCH_SIZE)
-window_val_gen_online = window_generator_online(VAL_DIRS, N_WINDOW_VAL, WINDOW_BATCH_SIZE)
-
-
-def video_gen(video_dirs, n_samples, batch_size):
-    n_samples_per_video = n_samples // len(video_dirs)
-
-    idx = 0
-    x_batch = np.zeros((batch_size, TIMESTEPS, 224, 224, 3), dtype=np.float32)
-    y_batch = np.zeros((batch_size, 1), dtype=np.uint8)
-
-    while True:
+    def fit(self, video_dirs):
+        train, val = [], []
         for video_dir in video_dirs:
-            video_path = str(video_dir / 'video.mp4')
-            video = skvideo.io.vread(video_path)
-            n_frames = video.shape[0]
-            fps = VideoFileClip(video_path).fps
+            data = self.extract_data(video_dir)
+            pivot = round(
+                (self.n_train) / (self.n_train + self.n_val) * len(data))
+            train.extend(windows[:pivot])
+            val.extend(windows[pivot:])
 
-            info = read_json(video_dir / 'info.json')
-            label = np.zeros(n_frames, dtype=np.uint8)
-            for s, e in zip(info['starts'], info['ends']):
-                fs = round(s * fps)
-                fe = round(e * fps)
-                label[fs:fe] = 1
+        train = random.sample(train, k=self.n_train)
+        val = random.sample(val, k=self.n_val)
 
-            windows = [(t - TIMESTEPS, t) for t in range(TIMESTEPS, video.shape[0])]
-            windows = random.sample(windows, n_samples_per_video)
-            for (s, e) in windows:
-                for i in range(e - s):
-                    x_batch[idx][i] = imresize(video[s + i], (224, 224))
-                y_batch[idx] = label[e - 1]
+        self.target_dir.mkdir(exist_ok=True, parents=True)
+        self.gen_npz(train, 'image_train')
+        self.gen_npz(val, 'image_val')
 
-                if idx + 1 == batch_size:
-                    yield x_batch, y_batch
-                idx = (idx + 1) % batch_size
-            
-            del video, label, windows
+
+class WindowNpzCreator(object):
+    '''Create `window_train.npz`, `window_val.npz`  at target_dir from windows extracted from video_dirs
+    '''
+
+    def __init__(self,
+                 n_train=None,
+                 n_val=None,
+                 fps=1,
+                 timesteps=5,
+                 overlap=4,
+                 target_dir=None):
+        self.n_train = n_train or 100
+        self.n_val = n_val or 20
+        self.fps = fps
+        self.timesteps = timesteps
+        self.overlap = overlap
+        self.target_dir = target_dir or Path('./npz/')
+
+    def extract_windows(self, video_dir):
+        video = VideoFileClip(str(video_dir / 'video.mp4'))
+        info = json.load((video_dir / 'info.json').open())
+        n_frames = int(video.duration) * self.fps
+        timesteps = self.timesteps
+        overlap = self.overlap
+
+        label = np.zeros(n_frames, dtype=np.uint8)
+        for s, e in zip(info['starts'], info['ends']):
+            fs = round(s * self.fps)
+            fe = round(e * self.fps)
+            label[fs:fe + 1] = 1
+
+        windows = [(video, f - timesteps, f, label[f - 1])
+                   for f in range(timesteps, n_frames, timesteps - overlap)]
+        return windows
+
+    def gen_npz(self, windows, name):
+        n = len(windows)
+        xs = np.zeros((n, self.timesteps, 224, 224, 3), dtype=np.float32)
+        ys = np.zeros(n, dtype=np.uint8)
+        for i, (video, s, e, y) in enumerate(tqdm(windows)):
+            for j in range(e - s):
+                img = video.get_frame((s + j) / self.fps)
+                xs[i][j] = scipy.misc.imresize(img, (224, 224))
+            ys[i] = y
+
+        npz_path = self.target_dir / '{}.npz'.format(name)
+        np.savez(npz_path, xs=xs, ys=ys)
+
+    def fit(self, video_dirs):
+        train, val = [], []
+        for video_dir in video_dirs:
+            windows = self.extract_windows(video_dir)
+            random.shuffle(windows)
+            pivot = round(
+                (self.n_train) / (self.n_train + self.n_val) * len(windows))
+            train.extend(windows[:pivot])
+            val.extend(windows[pivot:])
+
+            print(video_dir, len(windows))
+
+        train = random.sample(train, k=self.n_train)
+        val = random.sample(val, k=self.n_val)
+
+        self.target_dir.mkdir(exist_ok=True, parents=True)
+        self.gen_npz(train, 'train')
+        self.gen_npz(val, 'val')
+
+
+def main():
+    dataset = Path('~/tthl-dataset/').expanduser()
+    video_dirs = sorted(dataset.glob('video*/'))
+
+    gen = ImageNpzCreator(n_train=10000, n_val=2000, fps=3)
+    gen.fit(video_dirs)
+
+    # gen = WindowNpyGenerator(
+    #     n_train=10000, n_val=2000, fps=3, timesteps=2, overlap=1)
+    # gen.fit(video_dirs)
 
 
 if __name__ == '__main__':
-    check()
-
-    for folder in [IMAGE_TRAIN, IMAGE_VAL, WINDOW_TRAIN, WINDOW_VAL]:
-        folder.mkdir(parents=True, exist_ok=True)
-
-    print('Train data:')
-    pprint(TRAIN_DIRS)
-    print('Validation data:')
-    pprint(VAL_DIRS)
-
-    gen_image_npy(TRAIN_DIRS, IMAGE_TRAIN, N_IMAGE_TRAIN)
-    gen_image_npy(VAL_DIRS, IMAGE_VAL, N_IMAGE_VAL)
-    # gen_window_npy(TRAIN_DIRS, WINDOW_TRAIN, N_WINDOW_TRAIN)
-    # gen_window_npy(VAL_DIRS, WINDOW_VAL, N_WINDOW_VAL)
+    main()
