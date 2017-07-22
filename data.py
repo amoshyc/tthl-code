@@ -51,8 +51,8 @@ class ImageNpzCreator(object):
             data = self.extract_data(video_dir)
             pivot = round(
                 (self.n_train) / (self.n_train + self.n_val) * len(data))
-            train.extend(windows[:pivot])
-            val.extend(windows[pivot:])
+            train.extend(data[:pivot])
+            val.extend(data[pivot:])
 
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
