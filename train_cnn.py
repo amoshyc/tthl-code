@@ -40,9 +40,9 @@ def main():
     model.summary()
 
     print('Loading data...', end='')
-    train = np.load('npy/image_train.npz')
+    train = np.load('npz/image_train.npz')
     x_train, y_train = train['xs'], train['ys']
-    val = np.load('npy/image_val.npz')
+    val = np.load('npz/image_val.npz')
     x_val, y_val = val['xs'], val['ys']
     print('ok')
 
