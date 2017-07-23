@@ -96,6 +96,8 @@ class WindowNpzCreator(object):
 
         windows = [(video, f - timesteps, f, label[f - 1])
                    for f in range(timesteps, n_frames, timesteps - overlap)]
+        print(video_dir, video.duration, len(windows))
+
         return windows
 
     def gen_npz(self, windows, name):
@@ -122,8 +124,6 @@ class WindowNpzCreator(object):
             train.extend(windows[:pivot])
             val.extend(windows[pivot:])
 
-            print(video_dir, len(windows))
-
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
 
@@ -140,7 +140,7 @@ def main():
     # gen.fit(video_dirs)
 
     gen = WindowNpzCreator(
-        n_train=10000, n_val=2000, fps=3, timesteps=6, overlap=4)
+        n_train=10000, n_val=2000, fps=3, timesteps=3, overlap=2)
     gen.fit(video_dirs)
 
 
