@@ -119,7 +119,7 @@ class WindowNpzCreator(object):
         train, val = [], []
         for video_dir in video_dirs:
             windows = self.extract_windows(video_dir)
-            # random.shuffle(windows)
+            random.shuffle(windows)
             pivot = round(
                 (self.n_train) / (self.n_train + self.n_val) * len(windows))
             train.extend(windows[:pivot])
