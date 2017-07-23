@@ -60,7 +60,7 @@ def main():
         'validation_data': (x_val, y_val),
         'callbacks': get_callbacks('conv3d'),
     }
-    # model.fit(**fit_arg)
+    model.fit(**fit_arg)
 
 
 if __name__ == '__main__':
