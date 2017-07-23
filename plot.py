@@ -31,4 +31,7 @@ def plot_svg(log, name, n_epochs=None):
 
 
 if __name__ == '__main__':
-    plot_svg(*argv[1:])
+    if len(argv) == 3:
+        plot_svg(argv[1], argv[2])
+    else:
+        plot_svg(argv[1], argv[2], int(argv[3]))
