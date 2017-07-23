@@ -24,7 +24,7 @@ def main():
         model = Sequential()
         model.add(TimeDistributed(BatchNormalization(), input_shape=(4, 224, 224, 3)))
         model.add(TimeDistributed(Conv2D(5, kernel_size=5, strides=2, activation='relu')))
-        model.add(TimeDistributed(Conv2D(10, kernel_size=4, strides=1, activation='relu')))
+        model.add(TimeDistributed(Conv2D(10, kernel_size=4, strides=2, activation='relu')))
         model.add(TimeDistributed(Conv2D(15, kernel_size=3, strides=1, activation='relu')))
         model.add(TimeDistributed(BatchNormalization()))
         model.add(TimeDistributed(MaxPooling2D(pool_size=3)))
@@ -54,7 +54,7 @@ def main():
     fit_arg = {
         'x': x_train, 
         'y': y_train,
-        'batch_size': 100,
+        'batch_size': 250,
         'epochs': 100,
         'shuffle': True,
         'validation_data': (x_val, y_val),
