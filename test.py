@@ -28,7 +28,7 @@ def main():
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=2))
         model.add(Conv2D(8, kernel_size=3, strides=2, activation='relu'))
-        model.add(Conv2D(4, kernel_size=2, strides=1, activation='relu'))
+        model.add(Conv2D(4, kernel_size=2, strides=2, activation='relu'))
         model.add(BatchNormalization())
         model.add(Flatten())
         model.add(Dense(16, activation='relu'))
