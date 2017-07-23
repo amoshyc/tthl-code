@@ -17,13 +17,13 @@ def plot_svg(log, name):
     acc_path = graph / (name + '_acc.svg')
 
     keys = ['loss', 'val_loss']
-    ax = df[keys][:22].plot(kind='line')
+    ax = df[keys][:20].plot(kind='line')
     ax.set_xlabel('epoch')
     ax.set_ylabel('loss(binary crossentropy)')
     plt.savefig(str(loss_path))
 
     keys = ['binary_accuracy', 'val_binary_accuracy']
-    ax = df[keys][:22].plot(kind='line')
+    ax = df[keys][:20].plot(kind='line')
     ax.set_xlabel('epoch')
     ax.set_ylabel('accuracy')
     plt.savefig(str(acc_path))
