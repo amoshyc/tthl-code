@@ -30,6 +30,8 @@ def main():
         model.add(Flatten())
         model.add(Dense(16, activation='relu'))
         model.add(Dropout(0.5))
+        model.add(Dense(8, activation='relu'))
+        model.add(Dropout(0.5))
         model.add(Dense(1, activation='sigmoid'))
 
     model_arg = {
@@ -49,7 +51,7 @@ def main():
         'x': x_train, 
         'y': y_train,
         'batch_size': 100,
-        'epochs': 50,
+        'epochs': 100,
         'shuffle': True,
         'validation_data': (x_val, y_val),
         'callbacks': get_callbacks('cnn'),
