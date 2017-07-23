@@ -96,8 +96,7 @@ class WindowNpzCreator(object):
 
         windows = [(video, f - timesteps, f, label[f - 1])
                    for f in range(timesteps, n_frames, timesteps - overlap)]
-        print(video_dir, video.duration, len(windows))
-
+        print(video_dir, int(video.duration), len(windows))
         return windows
 
     def gen_npz(self, windows, name):
