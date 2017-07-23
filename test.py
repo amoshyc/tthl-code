@@ -51,11 +51,11 @@ def main():
     fit_arg = {
         'x': x_train, 
         'y': y_train,
-        'batch_size': 100,
+        'batch_size': 80,
         'epochs': 100,
         'shuffle': True,
         'validation_data': (x_val, y_val),
-        'callbacks': get_callbacks('cnn'),
+        'callbacks': get_callbacks('conv3d'),
     }
     model.fit(**fit_arg)
 
