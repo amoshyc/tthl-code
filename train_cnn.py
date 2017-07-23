@@ -28,7 +28,7 @@ def main():
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=3))
         model.add(Flatten())
-        model.add(Dense(16), activation='relu')
+        model.add(Dense(16, activation='relu'))
         model.add(Dropout(0.5))
         model.add(Dense(1, activation='sigmoid'))
 
