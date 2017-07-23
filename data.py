@@ -73,13 +73,13 @@ class WindowNpzCreator(object):
                  fps=1,
                  timesteps=5,
                  overlap=4,
-                 target_dir=None):
+                 target_dir=Path('./npz/')):
         self.n_train = n_train or 100
         self.n_val = n_val or 20
         self.fps = fps
         self.timesteps = timesteps
         self.overlap = overlap
-        self.target_dir = target_dir or Path('./npz/')
+        self.target_dir = target_dir
 
     def extract_windows(self, video_dir):
         video = VideoFileClip(str(video_dir / 'video.mp4'))
@@ -119,7 +119,7 @@ class WindowNpzCreator(object):
         train, val = [], []
         for video_dir in video_dirs:
             windows = self.extract_windows(video_dir)
-            random.shuffle(windows)
+            # random.shuffle(windows)
             pivot = round(
                 (self.n_train) / (self.n_train + self.n_val) * len(windows))
             train.extend(windows[:pivot])
