@@ -10,25 +10,25 @@ import pandas as pd
 # from keras.utils import plot_model
 # plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=False)  
 
-def plot_svg(log, name):
+def plot_svg(log, name, n_epochs=None):
     df = pd.read_csv(log)
     graph = Path('./graph/')
     loss_path = graph / (name + '_loss.svg')
     acc_path = graph / (name + '_acc.svg')
+    n_epochs = n_epochs or df.shape[0]
 
     keys = ['loss', 'val_loss']
-    ax = df[keys][:22].plot(kind='line')
+    ax = df[keys][:n_epochs].plot(kind='line')
     ax.set_xlabel('epoch')
     ax.set_ylabel('loss(binary crossentropy)')
     plt.savefig(str(loss_path))
 
     keys = ['binary_accuracy', 'val_binary_accuracy']
-    ax = df[keys][:22].plot(kind='line')
+    ax = df[keys][:n_epochs].plot(kind='line')
     ax.set_xlabel('epoch')
     ax.set_ylabel('accuracy')
     plt.savefig(str(acc_path))
 
 
 if __name__ == '__main__':
-    log, name = argv[1], argv[2]
-    plot_svg(log, name)
+    plot_svg(*argv)
