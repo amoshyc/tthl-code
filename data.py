@@ -109,6 +109,8 @@ class WindowNpzCreator(object):
                 xs[i][j] = scipy.misc.imresize(img, (224, 224))
             ys[i] = y
 
+        n_1 = np.count_nonzero(ys)
+        print('{}: {} / {} = {}'.format(name, n_1, len(ys), n_1 / len(ys)))
         npz_path = self.target_dir / '{}.npz'.format(name)
         np.savez(npz_path, xs=xs, ys=ys)
         del xs, ys
