@@ -19,17 +19,16 @@ from utils import get_callbacks
 
 
 def main():
-    with tf.device('/gpu:2'):
+    with tf.device('/gpu:3'):
         model = Sequential()
         model.add(BatchNormalization(input_shape=(224, 224, 3)))
-        model.add(Conv2D(4, kernel_size=5, strides=3, activation='relu'))
-        model.add(Conv2D(8, kernel_size=5, strides=2, activation='relu'))
-        model.add(Conv2D(12, kernel_size=3, strides=1, activation='relu'))
+        model.add(Conv2D(5, kernel_size=5, strides=3, activation='relu'))
+        model.add(Conv2D(10, kernel_size=4, strides=2, activation='relu'))
+        model.add(Conv2D(15, kernel_size=3, strides=1, activation='relu'))
+        model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=3))
         model.add(Flatten())
-        model.add(Dense(16))
-        model.add(Dropout(0.5))
-        model.add(Dense(8))
+        model.add(Dense(16), activation='relu')
         model.add(Dropout(0.5))
         model.add(Dense(1, activation='sigmoid'))
 
@@ -51,7 +50,7 @@ def main():
         'y': y_train,
         'batch_size': 100,
         'epochs': 50,
-        # 'shuffle': True,
+        'shuffle': True,
         'validation_data': (x_val, y_val),
         'callbacks': get_callbacks('cnn'),
     }

@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # from keras.utils import plot_model
-# plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=False)  
+# plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=False)
+
 
 def plot_svg(log, name, n_epochs=None):
     df = pd.read_csv(log)
