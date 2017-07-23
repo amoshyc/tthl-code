@@ -26,13 +26,13 @@ def main():
         model.add(Conv2D(10, kernel_size=4, strides=1, activation='relu'))
         model.add(Conv2D(15, kernel_size=3, strides=1, activation='relu'))
         model.add(BatchNormalization())
-        model.add(MaxPooling2D(pool_size=3))
-        model.add(Conv2D(8, kernel_size=3, strides=1, activation='relu'))
-        model.add(Conv2D(4, kernel_size=2, strides=2, activation='relu'))
+        model.add(MaxPooling2D(pool_size=2))
+        model.add(Conv2D(8, kernel_size=3, strides=2, activation='relu'))
+        model.add(Conv2D(4, kernel_size=2, strides=1, activation='relu'))
         model.add(BatchNormalization())
         model.add(Flatten())
         model.add(Dense(16, activation='relu'))
-        model.add(Dropout(0.5))
+        model.add(Dropout(0.6))
         model.add(Dense(1, activation='sigmoid'))
 
     model_arg = {
@@ -52,7 +52,7 @@ def main():
         'x': x_train, 
         'y': y_train,
         'batch_size': 100,
-        'epochs': 100,
+        'epochs': 200,
         'shuffle': True,
         'validation_data': (x_val, y_val),
         'callbacks': get_callbacks('cnn'),
