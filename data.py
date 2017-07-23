@@ -139,7 +139,7 @@ def main():
     # gen.fit(video_dirs)
 
     gen = WindowNpzCreator(
-        n_train=10000, n_val=2000, fps=3, timesteps=3, overlap=2)
+        n_train=10000, n_val=2000, fps=3, timesteps=6, overlap=3)
     gen.fit(video_dirs)
 
 
