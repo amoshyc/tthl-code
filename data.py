@@ -136,8 +136,8 @@ def main():
     dataset = Path('~/tthl-dataset/').expanduser()
     video_dirs = sorted(dataset.glob('video*/'))
 
-    gen = ImageNpzCreator(n_train=10000, n_val=2000, fps=3)
-    gen.fit(video_dirs)
+    # gen = ImageNpzCreator(n_train=10000, n_val=2000, fps=3)
+    # gen.fit(video_dirs)
 
     gen = WindowNpyGenerator(
         n_train=10000, n_val=2000, fps=3, timesteps=6, overlap=4)
