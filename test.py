@@ -48,6 +48,9 @@ def main():
     val = np.load('npz/window_val.npz')
     x_val, y_val = val['xs'], val['ys']
 
+    print(np.count_nonzero(y_train))
+    print(np.count_nonzero(y_val))
+
     fit_arg = {
         'x': x_train, 
         'y': y_train,
@@ -57,7 +60,7 @@ def main():
         'validation_data': (x_val, y_val),
         'callbacks': get_callbacks('conv3d'),
     }
-    model.fit(**fit_arg)
+    # model.fit(**fit_arg)
 
 
 if __name__ == '__main__':
