@@ -139,9 +139,9 @@ def main():
     gen = ImageNpzCreator(n_train=10000, n_val=2000, fps=3)
     gen.fit(video_dirs)
 
-    # gen = WindowNpyGenerator(
-    #     n_train=10000, n_val=2000, fps=3, timesteps=2, overlap=1)
-    # gen.fit(video_dirs)
+    gen = WindowNpyGenerator(
+        n_train=10000, n_val=2000, fps=3, timesteps=6, overlap=4)
+    gen.fit(video_dirs)
 
 
 if __name__ == '__main__':

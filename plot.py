@@ -7,6 +7,8 @@ sns.set_style("darkgrid")
 import matplotlib.pyplot as plt
 import pandas as pd
 
+# python plot.py "$(ls -t log/* | head -n 1)" name
+
 # from keras.utils import plot_model
 # plot_model(model, to_file='model.png', show_shapes=True, show_layer_names=False)
 
