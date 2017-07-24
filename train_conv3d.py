@@ -22,17 +22,19 @@ from utils import get_callbacks
 def main():
     with tf.device('/gpu:3'):
         model = Sequential()
-        model.add(TimeDistributed(BatchNormalization(), input_shape=(TIMESTEPS, 224, 224, 3)))
-        model.add(TimeDistributed(Conv2D(4, kernel_size=5, strides=3, activation='relu')))
-        model.add(TimeDistributed(Conv2D(8, kernel_size=5, strides=2, activation='relu')))
-        model.add(TimeDistributed(Conv2D(12, kernel_size=3, strides=1, activation='relu')))
-        model.add(TimeDistributed(BatchNormalization()))
+        # model.add(TimeDistributed(BatchNormalization(), input_shape=(4, 224, 224, 3)))
+        model.add(BatchNormalization(input_shape=(4, 224, 224, 3)))
+        model.add(TimeDistributed(Conv2D(5, kernel_size=5, strides=2, activation='relu')))
+        model.add(TimeDistributed(Conv2D(10, kernel_size=4, strides=2, activation='relu')))
+        model.add(TimeDistributed(Conv2D(15, kernel_size=3, strides=1, activation='relu')))
+        model.add(BatchNormalization())
         model.add(TimeDistributed(MaxPooling2D(pool_size=3)))
-        model.add(Conv3D(4, kernel_size=5, strides=1, activation='relu'))
+        model.add(Conv3D(4, kernel_size=2, strides=1, activation='relu'))
+        model.add(Conv3D(1, kernel_size=2, strides=1, activation='relu'))
         model.add(BatchNormalization())
         model.add(Flatten())
         model.add(Dense(16))
-        model.add(Dropout(0.3))
+        model.add(Dropout(0.5))
         model.add(Dense(1, activation='sigmoid'))
 
     model_arg = {
@@ -43,16 +45,24 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    fit_arg = {
-        'generator': window_train_gen_online,
-        'steps_per_epoch': N_WINDOW_TRAIN // WINDOW_BATCH_SIZE,
-        'epochs': 30,
-        'validation_data': window_val_gen_online,
-        'validation_steps': N_WINDOW_VAL // WINDOW_BATCH_SIZE,
-        'callbacks': get_callbacks('conv3d')
-    }
+    train = np.load('npz/window_train.npz')
+    x_train, y_train = train['xs'], train['ys']
+    val = np.load('npz/window_val.npz')
+    x_val, y_val = val['xs'], val['ys']
 
-    model.fit_generator(**fit_arg)
+    print(np.count_nonzero(y_train) / len(y_train))
+    print(np.count_nonzero(y_val) / len(y_val))
+
+    fit_arg = {
+        'x': x_train, 
+        'y': y_train,
+        'batch_size': 250,
+        'epochs': 100,
+        'shuffle': True,
+        'validation_data': (x_val, y_val),
+        'callbacks': get_callbacks('conv3d'),
+    }
+    model.fit(**fit_arg)
 
 
 if __name__ == '__main__':
