@@ -58,7 +58,7 @@ def main():
     fit_arg = {
         'x': x_train, 
         'y': y_train,
-        'batch_size': 250,
+        'batch_size': 100,
         'epochs': 100,
         'shuffle': True,
         'validation_data': (x_val, y_val),
