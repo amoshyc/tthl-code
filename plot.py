@@ -21,7 +21,7 @@ def plot_svg(log, name, n_epochs=None):
     n_epochs = n_epochs or df.shape[0]
 
     print('min loss:', df['val_loss'].min())
-    print('max acc :', df['val_acc'].max())
+    print('max acc :', df['val_binary_accuracy'].max())
 
     keys = ['loss', 'val_loss']
     ax = df[keys][:n_epochs].plot(kind='line')
