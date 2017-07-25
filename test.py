@@ -22,7 +22,6 @@ from utils import get_callbacks
 def main():
     with tf.device('/gpu:3'):
         model = Sequential()
-        # model.add(TimeDistributed(BatchNormalization(), input_shape=(4, 224, 224, 3)))
         model.add(BatchNormalization(input_shape=(4, 224, 224, 3)))
         model.add(TimeDistributed(Conv2D(3, kernel_size=5, strides=1, activation='relu')))
         model.add(TimeDistributed(Conv2D(6, kernel_size=4, strides=1, activation='relu')))
