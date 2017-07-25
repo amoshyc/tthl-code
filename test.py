@@ -15,24 +15,20 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-from data import *
 from utils import get_callbacks
 
 
 def main():
     model = Sequential()
     model.add(BatchNormalization(input_shape=(4, 224, 224, 3)))
-    model.add(TimeDistributed(Conv2D(3, kernel_size=5, strides=1, activation='relu')))
-    model.add(TimeDistributed(Conv2D(6, kernel_size=4, strides=1, activation='relu')))
-    model.add(TimeDistributed(Conv2D(9, kernel_size=3, strides=1, activation='relu')))
+    model.add(TimeDistributed(Conv2D(5, kernel_size=5, strides=2, activation='relu')))
+    model.add(TimeDistributed(Conv2D(10, kernel_size=4, strides=2, activation='relu')))
+    model.add(TimeDistributed(Conv2D(15, kernel_size=3, strides=1, activation='relu')))
     model.add(BatchNormalization())
-    model.add(TimeDistributed(Conv2D(7, kernel_size=5, strides=2, activation='relu')))
-    model.add(TimeDistributed(Conv2D(4, kernel_size=4, strides=1, activation='relu')))
+    model.add(TimeDistributed(MaxPooling2D(pool_size=3)))
+    model.add(TimeDistributed(Flatten()))
+    model.add(LSTM(10))
     model.add(BatchNormalization())
-    model.add(Conv3D(4, kernel_size=2, strides=1, activation='relu'))
-    model.add(Conv3D(1, kernel_size=2, strides=1, activation='relu'))
-    model.add(BatchNormalization())
-    model.add(Flatten())
     model.add(Dense(16))
     model.add(Dropout(0.5))
     model.add(Dense(1, activation='sigmoid'))
@@ -45,24 +41,16 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    train = np.load('npz/window_train.npz')
-    x_train, y_train = train['xs'], train['ys']
-    val = np.load('npz/window_val.npz')
-    x_val, y_val = val['xs'], val['ys']
-
-    print(np.count_nonzero(y_train) / len(y_train))
-    print(np.count_nonzero(y_val) / len(y_val))
-
     fit_arg = {
-        'x': x_train, 
-        'y': y_train,
-        'batch_size': 100,
-        'epochs': 100,
-        'shuffle': True,
-        'validation_data': (x_val, y_val),
-        'callbacks': get_callbacks('conv3d'),
+        'generator': window_train_gen,
+        'steps_per_epoch': N_WINDOW_TRAIN // WINDOW_BATCH_SIZE,
+        'epochs': 30,
+        'validation_data': window_val_gen,
+        'validation_steps': N_WINDOW_VAL // WINDOW_BATCH_SIZE,
+        'callbacks': get_callbacks('conv3d')
     }
-    model.fit(**fit_arg)
+
+    model.fit_generator(**fit_arg)
 
 
 if __name__ == '__main__':
