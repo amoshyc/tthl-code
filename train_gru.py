@@ -15,7 +15,6 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 
-from data import *
 from utils import get_callbacks
 
 
@@ -42,16 +41,24 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    fit_arg = {
-        'generator': window_train_gen,
-        'steps_per_epoch': N_WINDOW_TRAIN // WINDOW_BATCH_SIZE,
-        'epochs': 30,
-        'validation_data': window_val_gen,
-        'validation_steps': N_WINDOW_VAL // WINDOW_BATCH_SIZE,
-        'callbacks': get_callbacks('conv3d')
-    }
+    train = np.load('npz/window_train.npz')
+    x_train, y_train = train['xs'], train['ys']
+    val = np.load('npz/window_val.npz')
+    x_val, y_val = val['xs'], val['ys']
 
-    model.fit_generator(**fit_arg)
+    print(np.count_nonzero(y_train) / len(y_train))
+    print(np.count_nonzero(y_val) / len(y_val))
+
+    fit_arg = {
+        'x': x_train, 
+        'y': y_train,
+        'batch_size': 250,
+        'epochs': 100,
+        'shuffle': True,
+        'validation_data': (x_val, y_val),
+        'callbacks': get_callbacks('conv3d'),
+    }
+    model.fit(**fit_arg)
 
 
 if __name__ == '__main__':
