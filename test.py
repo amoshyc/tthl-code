@@ -28,6 +28,7 @@ def main():
     model.add(BatchNormalization())
     model.add(Conv2D(10, kernel_size=5, strides=2, activation='relu'))
     model.add(Conv2D(5, kernel_size=3, strides=1, activation='relu'))
+    model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=3))
     model.add(Flatten())
     model.add(Dense(16, activation='relu'))
@@ -42,32 +43,21 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    # train = np.load('npz/image_train.npz')
-    # x_train, y_train = train['xs'], train['ys']
-    # val = np.load('npz/image_val.npz')
-    # x_val, y_val = val['xs'], val['ys']
+    train = np.load('npz/image_train.npz')
+    x_train, y_train = train['xs'], train['ys']
+    val = np.load('npz/image_val.npz')
+    x_val, y_val = val['xs'], val['ys']
 
-    # fit_arg = {
-    #     'x': x_train, 
-    #     'y': y_train,
-    #     'batch_size': 100,
-    #     'epochs': 100,
-    #     'shuffle': True,
-    #     'validation_data': (x_val, y_val),
-    #     'callbacks': get_callbacks('cnn'),
-    # }
-    # model.fit(**fit_arg)
-
-    # fit_gen_arg = {
-    #     'generator': image_train_gen,
-    #     'steps_per_epoch': N_IMAGE_TRAIN // IMAGE_BATCH_SIZE,
-    #     'epochs': 30,
-    #     'validation_data': image_val_gen,
-    #     'validation_steps': N_IMAGE_VAL // IMAGE_BATCH_SIZE,
-    #     'callbacks': get_callbacks('cnn')
-    # }
-
-    # model.fit_generator(**fit_gen_arg)
+    fit_arg = {
+        'x': x_train, 
+        'y': y_train,
+        'batch_size': 100,
+        'epochs': 100,
+        'shuffle': True,
+        'validation_data': (x_val, y_val),
+        'callbacks': get_callbacks('cnn'),
+    }
+    model.fit(**fit_arg)
 
 
 if __name__ == '__main__':
