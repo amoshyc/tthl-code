@@ -56,7 +56,7 @@ def main():
         'epochs': 100,
         'shuffle': True,
         'validation_data': (x_val, y_val),
-        'callbacks': get_callbacks('conv3d'),
+        'callbacks': get_callbacks('bilstm'),
     }
     model.fit(**fit_arg)
 

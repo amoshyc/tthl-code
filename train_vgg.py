@@ -53,17 +53,6 @@ def main():
     }
     model.fit(**fit_arg)
 
-    # fit_gen_arg = {
-    #     'generator': image_train_gen,
-    #     'steps_per_epoch': N_IMAGE_TRAIN // IMAGE_BATCH_SIZE,
-    #     'epochs': 30,
-    #     'validation_data': image_val_gen,
-    #     'validation_steps': N_IMAGE_VAL // IMAGE_BATCH_SIZE,
-    #     'callbacks': get_callbacks('cnn')
-    # }
-
-    # model.fit_generator(**fit_gen_arg)
-
 
 if __name__ == '__main__':
     main()
