@@ -39,21 +39,21 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    train = np.load('npz/image_train.npz')
-    x_train, y_train = train['xs'], train['ys']
-    val = np.load('npz/image_val.npz')
-    x_val, y_val = val['xs'], val['ys']
+    # train = np.load('npz/image_train.npz')
+    # x_train, y_train = train['xs'], train['ys']
+    # val = np.load('npz/image_val.npz')
+    # x_val, y_val = val['xs'], val['ys']
 
-    fit_arg = {
-        'x': x_train, 
-        'y': y_train,
-        'batch_size': 100,
-        'epochs': 100,
-        'shuffle': True,
-        'validation_data': (x_val, y_val),
-        'callbacks': get_callbacks('cnn'),
-    }
-    model.fit(**fit_arg)
+    # fit_arg = {
+    #     'x': x_train, 
+    #     'y': y_train,
+    #     'batch_size': 100,
+    #     'epochs': 100,
+    #     'shuffle': True,
+    #     'validation_data': (x_val, y_val),
+    #     'callbacks': get_callbacks('cnn'),
+    # }
+    # model.fit(**fit_arg)
 
     # fit_gen_arg = {
     #     'generator': image_train_gen,
