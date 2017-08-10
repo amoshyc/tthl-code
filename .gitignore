@@ -104,3 +104,9 @@ ENV/
 nohup.out
 npy/
 npz/
+d1/
+*.svg
+*.csv
+*.npz
+*.npy
+*.mp4

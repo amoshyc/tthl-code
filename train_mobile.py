@@ -1,6 +1,3 @@
-import json
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 
@@ -14,24 +11,27 @@ from keras.models import Sequential, Model
 from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
-from keras.applications.vgg16 import VGG16
+from keras.applications.mobilenet import MobileNet
 
 from utils import get_callbacks
 
 
 def main():
-    with tf.device('/gpu:2'):
-        inp = Input(shape=(224, 224, 3))
-        x = BatchNormalization()(inp)
-        x = VGG16(weights='imagenet', include_top=False, pooling='max')(x)
-        x = Dense(16, activation='relu')(x)
-        x = Dropout(0.5)(x)
-        x = Dense(1, activation='sigmoid')(x)
-        model = Model(inputs=inp, outputs=x)
+    inp = Input(shape=(224, 224, 3))
+    x = BatchNormalization()(inp)
+    x = MobileNet(
+        weights='imagenet',
+        include_top=False,
+        pooling='max',
+        input_shape=(224, 224, 3))(x)
+    x = Dense(16, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    x = Dense(1, activation='sigmoid')(x)
+    model = Model(inputs=inp, outputs=x)
 
     model_arg = {
         'loss': 'binary_crossentropy',
-        'optimizer': 'sgd',
+        'optimizer': 'adadelta',
         'metrics': ['binary_accuracy']
     }
     model.compile(**model_arg)
@@ -43,13 +43,13 @@ def main():
     x_val, y_val = val['xs'], val['ys']
 
     fit_arg = {
-        'x': x_train, 
+        'x': x_train,
         'y': y_train,
         'batch_size': 40,
         'epochs': 100,
         'shuffle': True,
         'validation_data': (x_val, y_val),
-        'callbacks': get_callbacks('vgg'),
+        'callbacks': get_callbacks('mobile'),
     }
     model.fit(**fit_arg)
 

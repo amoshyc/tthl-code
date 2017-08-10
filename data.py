@@ -5,6 +5,7 @@ import numpy as np
 import scipy.misc
 from moviepy.editor import VideoFileClip
 from tqdm import tqdm
+from config import *
 
 
 class ImageNpzCreator(object):
@@ -46,7 +47,7 @@ class ImageNpzCreator(object):
         np.savez(npz_path, xs=xs, ys=ys)
         del xs, ys
 
-    def fit(self, video_dirs):
+    def fit1(self, video_dirs):
         train, val = [], []
         for video_dir in video_dirs:
             data = self.extract_data(video_dir)
@@ -55,6 +56,21 @@ class ImageNpzCreator(object):
             train.extend(data[:pivot])
             val.extend(data[pivot:])
 
+        train = random.sample(train, k=self.n_train)
+        val = random.sample(val, k=self.n_val)
+
+        self.target_dir.mkdir(exist_ok=True, parents=True)
+        self.gen_npz(train, 'image_train')
+        self.gen_npz(val, 'image_val')
+
+    def fit2(self, video_dirs):
+        pivot = -1
+        train, val = [], []
+        for video_dir in video_dirs[:pivot]:
+            train.extend(self.extract_data(video_dir))
+        for video_dir in video_dirs[pivot:]:
+            val.extend(self.extract_data(video_dir))
+        
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
 
@@ -134,15 +150,12 @@ class WindowNpzCreator(object):
 
 
 def main():
-    dataset = Path('~/tthl-dataset/').expanduser()
-    video_dirs = sorted(dataset.glob('video*/'))
+    gen = ImageNpzCreator(n_train=10000, n_val=2000, fps=2, target_dir=d2_dir)
+    gen.fit2(video_dirs)
 
-    # gen = ImageNpzCreator(n_train=10000, n_val=2000, fps=3)
+    # gen = WindowNpzCreator(
+    #     n_train=10000, n_val=2000, fps=3, timesteps=4, overlap=3)
     # gen.fit(video_dirs)
-
-    gen = WindowNpzCreator(
-        n_train=10000, n_val=2000, fps=3, timesteps=4, overlap=3)
-    gen.fit(video_dirs)
 
 
 if __name__ == '__main__':

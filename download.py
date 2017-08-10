@@ -1,9 +1,7 @@
 import json
 from pathlib import Path
 from subprocess import run
-
-dataset = Path('~/tthl-dataset/').expanduser()
-video_dirs = sorted(dataset.glob('video*/'))
+from config import video_dirs
 
 # run(['rm', '-rf', '{}/**/*.mp4'.format(dataset)])
 
