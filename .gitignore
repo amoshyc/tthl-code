@@ -101,12 +101,13 @@ ENV/
 .mypy_cache/
 
 # this repo
-nohup.out
 npy/
 npz/
 d1/
+d2/
 *.svg
 *.csv
 *.npz
 *.npy
 *.mp4
+*.out

@@ -31,7 +31,7 @@ def main():
 
     model_arg = {
         'loss': 'binary_crossentropy',
-        'optimizer': 'adadelta',
+        'optimizer': 'sgd',
         'metrics': ['binary_accuracy']
     }
     model.compile(**model_arg)

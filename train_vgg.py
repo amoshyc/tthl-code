@@ -20,14 +20,13 @@ from utils import get_callbacks
 
 
 def main():
-    with tf.device('/gpu:2'):
-        inp = Input(shape=(224, 224, 3))
-        x = BatchNormalization()(inp)
-        x = VGG16(weights='imagenet', include_top=False, pooling='max')(x)
-        x = Dense(16, activation='relu')(x)
-        x = Dropout(0.5)(x)
-        x = Dense(1, activation='sigmoid')(x)
-        model = Model(inputs=inp, outputs=x)
+    inp = Input(shape=(224, 224, 3))
+    x = BatchNormalization()(inp)
+    x = VGG16(weights='imagenet', include_top=False, pooling='max')(x)
+    x = Dense(16, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    x = Dense(1, activation='sigmoid')(x)
+    model = Model(inputs=inp, outputs=x)
 
     model_arg = {
         'loss': 'binary_crossentropy',

@@ -31,7 +31,7 @@ def main():
 
     model_arg = {
         'loss': 'binary_crossentropy',
-        'optimizer': 'adadelta',
+        'optimizer': 'sgd',
         'metrics': ['binary_accuracy']
     }
     model.compile(**model_arg)
@@ -49,7 +49,7 @@ def main():
         'epochs': 100,
         'shuffle': True,
         'validation_data': (x_val, y_val),
-        'callbacks': get_callbacks('lenet'),
+        'callbacks': get_callbacks('googlenet'),
     }
     model.fit(**fit_arg)
 
