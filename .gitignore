@@ -108,6 +108,7 @@ d2/
 tmp/
 log/
 tensorflow-models/
+faster_rcnn*
 *.svg
 *.csv
 *.npz
