@@ -43,16 +43,13 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    train = np.load('npz/window_train.npz')
+    train = np.load('d2/window_train.npz')
     x_train, y_train = train['xs'], train['ys']
-    val = np.load('npz/window_val.npz')
+    val = np.load('d2/window_val.npz')
     x_val, y_val = val['xs'], val['ys']
 
-    print(np.count_nonzero(y_train) / len(y_train))
-    print(np.count_nonzero(y_val) / len(y_val))
-
     fit_arg = {
-        'x': x_train, 
+        'x': x_train,
         'y': y_train,
         'batch_size': 250,
         'epochs': 100,

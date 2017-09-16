@@ -21,13 +21,15 @@ from utils import get_callbacks
 def main():
     model = Sequential()
     model.add(BatchNormalization(input_shape=(4, 224, 224, 3)))
-    model.add(TimeDistributed(Conv2D(5, kernel_size=5, strides=2, activation='relu')))
-    model.add(TimeDistributed(Conv2D(10, kernel_size=4, strides=2, activation='relu')))
-    model.add(TimeDistributed(Conv2D(15, kernel_size=3, strides=1, activation='relu')))
+    model.add(TimeDistributed(Conv2D(5, kernel_size=5, strides=2)))
+    model.add(TimeDistributed(Conv2D(10, kernel_size=3, strides=2)))
+    model.add(TimeDistributed(Conv2D(15, kernel_size=3, strides=1)))
     model.add(BatchNormalization())
+    model.add(TimeDistributed(Activation('relu')))
     model.add(TimeDistributed(MaxPooling2D(pool_size=3)))
     model.add(TimeDistributed(Flatten()))
-    model.add(LSTM(10))
+    model.add(LSTM(256, return_sequences=True))
+    model.add(LSTM(64))
     model.add(BatchNormalization())
     model.add(Dense(16))
     model.add(Dropout(0.5))
@@ -41,19 +43,16 @@ def main():
     model.compile(**model_arg)
     model.summary()
 
-    train = np.load('npz/window_train.npz')
+    train = np.load('d2/window_train.npz')
     x_train, y_train = train['xs'], train['ys']
-    val = np.load('npz/window_val.npz')
+    val = np.load('d2/window_val.npz')
     x_val, y_val = val['xs'], val['ys']
 
-    print(np.count_nonzero(y_train) / len(y_train))
-    print(np.count_nonzero(y_val) / len(y_val))
-
     fit_arg = {
-        'x': x_train, 
+        'x': x_train,
         'y': y_train,
-        'batch_size': 250,
-        'epochs': 100,
+        'batch_size': 40,
+        'epochs': 50,
         'shuffle': True,
         'validation_data': (x_val, y_val),
         'callbacks': get_callbacks('lstm'),
