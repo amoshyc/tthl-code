@@ -105,6 +105,8 @@ npy/
 npz/
 d1/
 d2/
+tmp/
+log/
 *.svg
 *.csv
 *.npz

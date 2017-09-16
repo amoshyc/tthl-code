@@ -14,7 +14,7 @@ from keras.models import Sequential, Model
 from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
-from keras.applications.vgg16 import VGG16
+from keras.applications.mobilenet import MobileNet
 
 from utils import get_callbacks
 
@@ -22,7 +22,7 @@ from utils import get_callbacks
 def main():
     inp = Input(shape=(224, 224, 3))
     x = BatchNormalization()(inp)
-    x = VGG16(weights='imagenet', include_top=False, pooling='max')(x)
+    x = MobileNet(input_shape=(224, 224, 3), weights='imagenet', include_top=False, pooling='max')(x)
     x = Dense(16, activation='relu')(x)
     x = Dropout(0.5)(x)
     x = Dense(1, activation='sigmoid')(x)
@@ -48,7 +48,7 @@ def main():
         'epochs': 100,
         'shuffle': True,
         'validation_data': (x_val, y_val),
-        'callbacks': get_callbacks('vgg'),
+        'callbacks': get_callbacks('mb'),
     }
     model.fit(**fit_arg)
 

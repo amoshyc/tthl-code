@@ -38,7 +38,7 @@ class ImageNpzCreator(object):
         xs = np.zeros((n, 224, 224, 3), dtype=np.float32)
         ys = np.zeros((n, 1), dtype=np.uint8)
 
-        for i, (video, f, y) in enumerate(tqdm(data)):
+        for i, (video, f, y) in enumerate(tqdm(data, ascii=True)):
             img = video.get_frame(f / self.fps)
             xs[i] = scipy.misc.imresize(img, (224, 224))
             ys[i] = y
@@ -64,13 +64,13 @@ class ImageNpzCreator(object):
         self.gen_npz(val, 'image_val')
 
     def fit2(self, video_dirs):
-        pivot = -1
+        pivot = -2
         train, val = [], []
         for video_dir in video_dirs[:pivot]:
             train.extend(self.extract_data(video_dir))
         for video_dir in video_dirs[pivot:]:
             val.extend(self.extract_data(video_dir))
-        
+
         train = random.sample(train, k=self.n_train)
         val = random.sample(val, k=self.n_val)
 
@@ -119,7 +119,7 @@ class WindowNpzCreator(object):
         n = len(windows)
         xs = np.zeros((n, self.timesteps, 224, 224, 3), dtype=np.float32)
         ys = np.zeros(n, dtype=np.uint8)
-        for i, (video, s, e, y) in enumerate(tqdm(windows)):
+        for i, (video, s, e, y) in enumerate(tqdm(windows, ascii=True)):
             for j in range(e - s):
                 img = video.get_frame((s + j) / self.fps)
                 xs[i][j] = scipy.misc.imresize(img, (224, 224))
@@ -131,7 +131,7 @@ class WindowNpzCreator(object):
         np.savez(npz_path, xs=xs, ys=ys)
         del xs, ys
 
-    def fit(self, video_dirs):
+    def fit1(self, video_dirs):
         train, val = [], []
         for video_dir in video_dirs:
             windows = self.extract_windows(video_dir)
@@ -148,14 +148,28 @@ class WindowNpzCreator(object):
         self.gen_npz(train, 'window_train')
         self.gen_npz(val, 'window_val')
 
+    def fit2(self, video_dirs):
+        pivot = -2
+        train, val = [], []
+        for video_dir in video_dirs[:pivot]:
+            train.extend(self.extract_windows(video_dir))
+        for video_dir in video_dirs[pivot:]:
+            val.extend(self.extract_windows(video_dir))
+
+        train = random.sample(train, k=self.n_train)
+        val = random.sample(val, k=self.n_val)
+
+        self.target_dir.mkdir(exist_ok=True, parents=True)
+        self.gen_npz(train, 'window_train')
+        self.gen_npz(val, 'window_val')
 
 def main():
-    gen = ImageNpzCreator(n_train=10000, n_val=2000, fps=2, target_dir=d2_dir)
-    gen.fit2(video_dirs)
+    # gen = ImageNpzCreator(n_train=10000, n_val=2000, fps=2, target_dir=d2_dir)
+    # gen.fit2(video_dirs)
 
-    # gen = WindowNpzCreator(
-    #     n_train=10000, n_val=2000, fps=3, timesteps=4, overlap=3)
-    # gen.fit(video_dirs)
+    gen = WindowNpzCreator(
+        n_train=10000, n_val=2000, fps=2, timesteps=4, overlap=3, target_dir=d2_dir)
+    gen.fit2(video_dirs)
 
 
 if __name__ == '__main__':

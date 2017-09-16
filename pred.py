@@ -30,7 +30,7 @@ def main():
 
     n_frames = int(video.duration) * args.fps
     xs = np.zeros((n_frames, 224, 224, 3), dtype=np.float32)
-    for f in tqdm(range(n_frames), desc='Loading Video Frames'):
+    for f in tqdm(range(n_frames), desc='Loading Video Frames', ascii=True):
         img = video.get_frame(f / args.fps)
         xs[f] = scipy.misc.imresize(img, (224, 224))
 

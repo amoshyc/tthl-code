@@ -1,6 +1,6 @@
 from pathlib import Path
 
-dataset = Path('~/tthl-dataset/').expanduser()
+dataset = Path('../ds/').expanduser()
 video_dirs = sorted(dataset.glob('video*/'))
 
 d1_dir = Path('./d1/')
