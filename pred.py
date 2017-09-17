@@ -38,6 +38,8 @@ def main():
     pred = model.predict(xs, args.bs, verbose=1)
     pred = pred.round().astype(np.uint8).flatten()
 
+    print(pred[:500])
+
     for i in range(n_frames - args.itv):
         s, t = i, i + args.itv
         if pred[s] == 1 and pred[t - 1] == 1:

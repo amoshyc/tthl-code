@@ -2,9 +2,12 @@ import json
 import argparse
 import subprocess
 import shutil
+import random
 from pathlib import Path
 from myutils import *
+import numpy as np
 from tqdm import tqdm
+from PIL import Image
 
 parser = argparse.ArgumentParser()
 parser.add_argument('ds', help='dataset', type=str, default='~/ds/')
@@ -76,11 +79,11 @@ def gen_npz():
     for folder in [Path('./train/'), Path('./val/')]:
         imgs = sorted(list(folder.glob('*/*.jpg')))
         random.shuffle(imgs)
-        classes = list([x for x in folder.iterdir() if x.is_dir()])
-        classes.sort()
+        classes = [folder / 'non', folder / 'hl'] # non=0, hl=1
 
         n_samples = len(imgs)
-        xs = np.zeros((n_samples, 224, 224, 3), dtype=np.float32)
+        target_size = (224, 224)
+        xs = np.zeros((n_samples, *target_size, 3), dtype=np.float32)
         ys = np.zeros((n_samples, ), dtype=np.uint8)
         for i, img_path in enumerate(tqdm(imgs, ascii=True)):
             img = Image.open(img_path)

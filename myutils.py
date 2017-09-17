@@ -43,8 +43,9 @@ def video_get_duration(video):
 def get_callbacks(name):
     from keras.callbacks import Callback, ModelCheckpoint, CSVLogger
 
+    pathlib.Path('./log').mkdir(exist_ok=True)
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    csv_path = 'inc/cnn_' + now + '.csv'
-    ckpt_path = 'inc/cnn_' + now + '_{epoch:02d}_{val_binary_accuracy:.3f}.h5'
+    csv_path = 'log/' + name + '_' + now + '.csv'
+    ckpt_path = 'log/' + name + '_' + now + '_{epoch:02d}_{val_binary_accuracy:.3f}.h5'
 
     return [CSVLogger(csv_path), ModelCheckpoint(ckpt_path)]
