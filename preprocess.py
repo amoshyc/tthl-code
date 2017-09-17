@@ -15,9 +15,9 @@ video_dirs = sorted(dataset.glob('video*/'))
 
 
 def download_and_write_frames():
-    target_hl_dir = Path('./data/hl/')
+    target_hl_dir = Path('./tmp/hl/')
     target_hl_dir.mkdir(parents=True, exist_ok=True)
-    target_non_dir = Path('./data/non/')
+    target_non_dir = Path('./tmp/non/')
     target_non_dir.mkdir(parents=True, exist_ok=True)
 
     for video_id, video_dir in enumerate(video_dirs):
