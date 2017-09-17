@@ -2,8 +2,6 @@ import subprocess
 import pathlib
 from datetime import datetime
 
-from keras.callbacks import Callback, ModelCheckpoint, CSVLogger
-
 
 def video_concat_segments(infile, outfile, ss, ee):
     assert len(ss) == len(ee), 'number of ss != number of ee'
@@ -43,6 +41,8 @@ def video_get_duration(video):
 
 
 def get_callbacks(name):
+    from keras.callbacks import Callback, ModelCheckpoint, CSVLogger
+
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     csv_path = 'inc/cnn_' + now + '.csv'
     ckpt_path = 'inc/cnn_' + now + '_{epoch:02d}_{val_binary_accuracy:.3f}.h5'

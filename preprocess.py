@@ -4,6 +4,7 @@ import subprocess
 import shutil
 from pathlib import Path
 from myutils import *
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('ds', help='dataset', type=str, default='~/ds/')
