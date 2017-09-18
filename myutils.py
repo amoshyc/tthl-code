@@ -30,7 +30,7 @@ def video_concat_segments(infile, outfile, ss, ee):
 def video_write_frames(infile, outfile='./frames/%05d.jpg', fps=1):
     # ffmpeg -i out.mp4 -vf fps="fps=1" outfile
     pathlib.Path(outfile).parent.mkdir(parents=True, exist_ok=True)
-    cmd = f'ffmpeg -i {infile} -vf fps="fps=1" {outfile}'
+    cmd = f'ffmpeg -i {infile} -vf fps="fps={fps}" {outfile}'
     subprocess.run(cmd, shell=True)
 
 

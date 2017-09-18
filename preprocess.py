@@ -35,7 +35,7 @@ def download_and_write_frames():
         hl_video_path = target_hl_dir / f'{video_id:02d}.mp4'
         hl_frame_fmt = target_hl_dir / f'{video_id:02d}_%05d.jpg'
         video_concat_segments(video, hl_video_path, starts, ends)
-        video_write_frames(hl_video_path, hl_frame_fmt, fps=2)
+        video_write_frames(hl_video_path, hl_frame_fmt, fps=1)
 
         # non-highlight video
         ss = [0] + info['ends']
@@ -45,12 +45,11 @@ def download_and_write_frames():
         non_video_path = target_non_dir / f'{video_id:02d}.mp4'
         non_frame_fmt = target_non_dir / f'{video_id:02d}_%05d.jpg'
         video_concat_segments(video, non_video_path, ss, es)
-        video_write_frames(non_video_path, non_frame_fmt, fps=2)
-
+        video_write_frames(non_video_path, non_frame_fmt, fps=1)
 
 def train_val_split():
-    hl_dir = Path('./data/hl/')
-    non_dir = Path('./data/non/')
+    hl_dir = Path('./tmp/hl/')
+    non_dir = Path('./tmp/non/')
 
     # yapf: disable
     target_dirs = [
@@ -78,7 +77,6 @@ def gen_npz():
 
     for folder in [Path('./train/'), Path('./val/')]:
         imgs = sorted(list(folder.glob('*/*.jpg')))
-        random.shuffle(imgs)
         classes = [folder / 'non', folder / 'hl'] # non=0, hl=1
 
         n_samples = len(imgs)
@@ -96,6 +94,14 @@ def gen_npz():
 
 
 if __name__ == '__main__':
+    print('download and write frames')
     download_and_write_frames()
+    print('-' * 50)
+
+    print('train val split')
     train_val_split()
+    print('-' * 50)
+
+    print('gen npz')
     gen_npz()
+    print('-' * 50)
