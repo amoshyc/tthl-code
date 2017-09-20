@@ -1,8 +1,7 @@
-import json
-from pathlib import Path
+import argparse
 
 import numpy as np
-import pandas as pd
+import scipy
 
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
@@ -10,22 +9,33 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 set_session(tf.Session(config=config))
 
-from keras.models import Sequential, Model
+from keras.models import Sequential, Model, load_model
 from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
-from keras.applications.mobilenet import MobileNet
+from tqdm import tqdm
 
 from myutils import get_callbacks
 
+parser = argparse.ArgumentParser()
+parser.add_argument('models', help='models', type=str, nargs='+')
+args = parser.parse_args()
+
+models = []
+for i, m in enumerate(tqdm(args.models, ascii=True)):
+    model = load_model(m, compile=False)
+    model.name = f'model_{i}'
+    model.trainable = False
+    models.append(model)
 
 inp = Input(shape=(224, 224, 3))
-x = BatchNormalization()(inp)
-x = MobileNet(input_shape=(224, 224, 3), weights='imagenet', include_top=False, pooling='max')(x)
-x = Dense(16, activation='relu')(x)
-x = Dropout(0.5)(x)
-x = Dense(1, activation='sigmoid')(x)
-model = Model(inputs=inp, outputs=x)
+fuse = concatenate([m(inp) for m in models])
+fuse = Dense(64, activation='relu')(fuse)
+fuse = Dropout(0.5)(fuse)
+fuse = Dense(16, activation='relu')(fuse)
+fuse = Dropout(0.5)(fuse)
+fuse = Dense(1, activation='sigmoid')(fuse)
+model = Model(inputs=inp, outputs=fuse)
 
 model_arg = {
     'loss': 'binary_crossentropy',
@@ -43,10 +53,10 @@ x_val, y_val = val['xs'], val['ys']
 fit_arg = {
     'x': x_train,
     'y': y_train,
-    'batch_size': 40,
-    'epochs': 50,
+    'batch_size': 30,
+    'epochs': 100,
     'shuffle': True,
     'validation_data': (x_val, y_val),
-    'callbacks': get_callbacks('mb'),
+    'callbacks': get_callbacks('ens1'),
 }
 model.fit(**fit_arg)

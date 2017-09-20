@@ -110,6 +110,7 @@ log/
 train/
 data/
 val/
+cam/
 tensorflow-models/
 faster_rcnn*
 *.svg

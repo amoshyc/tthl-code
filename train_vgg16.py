@@ -15,24 +15,21 @@ from keras.preprocessing import image
 from keras.layers import *
 from keras.optimizers import *
 from keras.applications.vgg16 import VGG16
-from keras.utils import to_categorical
 
 from myutils import get_callbacks
 
-base = VGG16(weights='imagenet', include_top=False, pooling='max')
-model = Sequential()
-model.add(BatchNormalization(input_shape=(224, 224, 3)))
-for layer in base.layers:
-    model.add(layer)
-model.add(Dense(16, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(2, activation='softmax'))
-model.summary()
+inp = Input(shape=(224, 224, 3))
+x = BatchNormalization()(inp)
+x = VGG16(weights='imagenet', include_top=False, pooling='max')(x)
+x = Dense(16, activation='relu')(x)
+x = Dropout(0.5)(x)
+x = Dense(1, activation='sigmoid')(x)
+model = Model(inputs=inp, outputs=x)
 
 model_arg = {
-    'loss': 'mse',
+    'loss': 'binary_crossentropy',
     'optimizer': 'sgd',
-    'metrics': ['accuracy']
+    'metrics': ['binary_accuracy']
 }
 model.compile(**model_arg)
 model.summary()
@@ -42,9 +39,6 @@ x_train, y_train = train['xs'], train['ys']
 val = np.load('npz/val.npz')
 x_val, y_val = val['xs'], val['ys']
 
-y_train = to_categorical(y_train, num_classes=2)
-y_val = to_categorical(y_val, num_classes=2)
-
 fit_arg = {
     'x': x_train,
     'y': y_train,
@@ -52,6 +46,6 @@ fit_arg = {
     'epochs': 50,
     'shuffle': True,
     'validation_data': (x_val, y_val),
-    'callbacks': get_callbacks('temp'),
+    'callbacks': get_callbacks('vgg16'),
 }
 model.fit(**fit_arg)

@@ -16,7 +16,7 @@ from keras.layers import *
 from keras.optimizers import *
 
 from data import *
-from utils import get_callbacks
+from myutils import get_callbacks
 
 
 def main():
