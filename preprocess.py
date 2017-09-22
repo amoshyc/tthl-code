@@ -92,16 +92,47 @@ def gen_npz():
         npz_path = npz_dir / f'{folder.stem}.npz'
         np.savez(npz_dir / folder.stem, xs=xs, ys=ys)
 
+def window_scroll(xs, ys, length, overlap):
+    step = length - overlap
+    n_samples = len(xs)
+    n_results = (n_samples - length) // step
+    x_res = np.zeros((n_results, length) + xs.shape[1:], dtype=np.float32)
+    y_res = np.zeros((n_results, ), dtype=np.uint8)
+
+    for i in tqdm(range(n_results), ascii=True):
+        window_s = i * step
+        for j in range(length):
+            x_res[i][j] = xs[window_s + j]
+        y_res[i] = round(np.sum(ys[window_s:window_s + length]) / length)
+    return x_res, y_res
+
+def gen_window_npz():
+    train = np.load('npz/train.npz')
+    x_train, y_train = train['xs'], train['ys']
+    x_win, y_win = window_scroll(x_train, y_train, 5, 4)
+    np.savez('npz/win_train.npz', xs=x_win, ys=y_win)
+
+    del x_win, y_win
+
+    val = np.load('npz/val.npz')
+    x_val, y_val = val['xs'], val['ys']
+    x_win, y_win = window_scroll(x_val, y_val, 5, 4)
+    np.savez('npz/win_val.npz', xs=x_win, ys=y_win)
+
 
 if __name__ == '__main__':
-    print('download and write frames')
-    download_and_write_frames()
-    print('-' * 50)
+    # print('download and write frames')
+    # download_and_write_frames()
+    # print('-' * 50)
+    #
+    # print('train val split')
+    # train_val_split()
+    # print('-' * 50)
+    #
+    # print('gen npz')
+    # gen_npz()
+    # print('-' * 50)
 
-    print('train val split')
-    train_val_split()
-    print('-' * 50)
-
-    print('gen npz')
-    gen_npz()
+    print('gen window npz')
+    gen_window_npz()
     print('-' * 50)

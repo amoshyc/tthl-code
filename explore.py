@@ -1,38 +1,47 @@
 import json
+import argparse
 from pathlib import Path
-from pprint import pprint
-import numpy as np
-from moviepy.editor import VideoFileClip
 
+import pandas as pd
+from scipy.misc import imread
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import ImageGrid
+from myutils import video_get_fps, video_get_duration
 
-def get_video_info(video_dir):
-    info = json.load((video_dir / 'info.json').open())
-    path = str(video_dir / 'video.mp4')
-    video = VideoFileClip(path)
-    res = {
-        'len': video.duration,
-        'hl': sum(e - s for s, e in zip(info['starts'], info['ends'])),
-        'fps': video.fps,
-        'seg': len(info['starts'])
-    }
-    return res
+parser = argparse.ArgumentParser()
+parser.add_argument('ds', help='dataset', type=str)
+args = parser.parse_args()
 
+video_dirs = [x for x in Path(args.ds).iterdir() if x.is_dir()]
+video_dirs = sorted(list(video_dirs))
 
-if __name__ == '__main__':
-    from config import video_dirs
+df = pd.DataFrame(
+    index=range(len(video_dirs)),
+    columns=['fps', 'len', 'hl', 'non'])
+for i, folder in enumerate(video_dirs):
+    video = folder / 'video.mp4'
+    info = json.load((folder / 'info.json').open())
+    ss, es = info['starts'], info['ends']
 
-    all_info = [get_video_info(video_dir) for video_dir in video_dirs]
+    df['fps'][i] = video_get_fps(video)
+    df['len'][i] = video_get_duration(video)
+    df['hl'][i]= sum(float(e) - float(s) for s, e in zip(ss, es))
+    df['non'][i] = df['len'][i] - df['hl'][i]
 
-    for key in ['len', 'hl', 'fps', 'seg']:
-        print(key.upper())
-        print('\n'.join([f'{info[key]:10.2f}' for info in all_info]))
-        # print('\n'.join([str(info[key]) for info in all_info]))
-        print('-' * 60)
+print(df)
+print('---')
+print(df[['len', 'hl', 'non']].sum(axis=0))
 
-    total_len = sum(info['len'] for info in all_info)
-    total_hl = sum(info['hl'] for info in all_info)
-    print('Total')
-    print('len :', total_len)
-    print('hl  :', total_hl)
-    print('prop:', total_hl / total_len)
-    print('seg :', sum(info['seg'] for info in all_info))
+fig = plt.figure(1, (16, 8))
+grid = ImageGrid(fig, 111, nrows_ncols=(3, 4), axes_pad=0.1)
+
+for i in range(11):
+    img = imread(f'./tmp/hl/{i:02d}_00001.jpg')
+    grid[i].imshow(img)
+    grid[i].axis('off')
+grid[-1].axis('off')
+
+plt.tight_layout()
+plt.savefig('explore.svg')

@@ -8,6 +8,9 @@ push:
 pull:
 	git pull
 
+explore:
+	python explore.py ../ds/
+
 convnet:
 	python train_vgg16.py
 	python train_vgg19.py

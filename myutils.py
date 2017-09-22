@@ -39,13 +39,20 @@ def video_get_duration(video):
     out = subprocess.check_output(cmd, shell=True)
     return float(str(out, 'utf-8'))
 
+def video_get_fps(video):
+    cmd = f'ffprobe -i {video} -show_entries stream=r_frame_rate -v quiet -of csv="p=0"'
+    out = subprocess.check_output(cmd, shell=True)
+    res = str(out.split()[0], 'utf-8').split('/')
+    nem, dem = float(res[0]), float(res[1])
+    return nem / dem
 
 def get_callbacks(name):
     from keras.callbacks import Callback, ModelCheckpoint, CSVLogger
 
-    pathlib.Path('./log').mkdir(exist_ok=True)
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    csv_path = 'log/' + name + '_' + now + '.csv'
-    ckpt_path = 'log/' + name + '_' + now + '_{epoch:02d}_{val_binary_accuracy:.3f}.h5'
+    log_dir = pathlib.Path('./log/') / f'{name}_{now}'
+    log_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = str(log_dir / 'log.csv')
+    ckpt_path = str(log_dir / '{val_binary_accuracy:.3f}_{epoch:02d}.h5')
 
     return [CSVLogger(csv_path), ModelCheckpoint(ckpt_path)]
