@@ -15,6 +15,7 @@ args = parser.parse_args()
 
 dataset = Path(args.ds).expanduser()
 video_dirs = sorted(dataset.glob('video*/'))
+print(video_dirs)
 
 
 def download_and_write_frames():
@@ -121,17 +122,17 @@ def gen_window_npz():
 
 
 if __name__ == '__main__':
-    # print('download and write frames')
-    # download_and_write_frames()
-    # print('-' * 50)
-    #
-    # print('train val split')
-    # train_val_split()
-    # print('-' * 50)
-    #
-    # print('gen npz')
-    # gen_npz()
-    # print('-' * 50)
+    print('download and write frames')
+    download_and_write_frames()
+    print('-' * 50)
+    
+    print('train val split')
+    train_val_split()
+    print('-' * 50)
+    
+    print('gen npz')
+    gen_npz()
+    print('-' * 50)
 
     print('gen window npz')
     gen_window_npz()

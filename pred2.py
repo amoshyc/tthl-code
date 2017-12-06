@@ -10,6 +10,8 @@ from keras.models import load_model
 from moviepy.editor import VideoFileClip, concatenate_videoclips
 from tqdm import tqdm
 
+from find_players import find_players
+
 
 def main():
     # yapf: disable
@@ -19,7 +21,7 @@ def main():
     parser.add_argument('--out', '-o', type=str, default='./hl.mp4', help='output name')
     parser.add_argument('--fps', type=int, default=2, help='fps')
     parser.add_argument('--itv', type=int, default=6, help='interval of adjusting')
-    parser.add_argument('--bs', type=int, default=80, help='batch size')
+    parser.add_argument('--bs', type=int, default=30, help='batch size')
     args = parser.parse_args()
     # yapf: enable
 
@@ -34,8 +36,10 @@ def main():
         img = video.get_frame(f / args.fps)
         xs[f] = scipy.misc.imresize(img, (224, 224))
 
+    p1, p2 = find_players(xs, save=False)
+
     # Predicting
-    pred = model.predict(xs, args.bs, verbose=1)
+    pred = model.predict([xs, p1, p2], args.bs, verbose=1)
     pred = pred.round().astype(np.uint8).flatten()
 
     print(pred[:500])

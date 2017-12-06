@@ -113,6 +113,7 @@ val/
 cam/
 tensorflow-models/
 faster_rcnn*
+keras*
 *.svg
 *.csv
 *.npz

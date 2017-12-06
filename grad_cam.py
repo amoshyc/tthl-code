@@ -23,14 +23,19 @@ model = load_model(args.model)
 paths = list(Path(args.image_dir).glob('*.jpg'))
 paths = random.sample(paths, k=500)
 output_dir = Path(args.output_dir)
-output_dir.mkdir(parents=True, exist_ok=True)
+(output_dir / '0').mkdir(parents=True, exist_ok=True)
+(output_dir / '1').mkdir(parents=True, exist_ok=True)
+layer_idx = utils.find_layer_idx(model, 'dense_2')
 
 for path in tqdm(paths, ascii=True):
     img = imread(str(path))
     img = imresize(img, (224, 224))
-    layer_idx = utils.find_layer_idx(model, 'dense_2')
 
+    pred = np.argmax(model.predict(np.expand_dims(img, axis=0)))    
     grads = visualize_cam(model, layer_idx, filter_indices=args.label, seed_input=img, backprop_modifier=None)
 
-    target_path = output_dir / f'{path.stem}_gcam.jpg'
-    imsave(str(target_path), overlay(grads, img))
+    target_path = output_dir / str(pred) / f'{path.stem}_gcam.jpg'
+    imsave(str(target_path), overlay(grads, img, 0.4))
+
+# python grad_cam.py .\log\gc_2017-09-24_20-17-12\0.836_08.h5 .\tmp\hl\ .\cam\hl\ 1
+# python grad_cam.py .\log\gc_2017-09-24_20-17-12\0.836_08.h5 .\tmp\non\ .\cam\non\ 0

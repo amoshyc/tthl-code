@@ -38,13 +38,13 @@ def get_graph():
     PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
     NUM_CLASSES = 90
 
-    # opener = urllib.request.URLopener()
-    # opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
-    # tar_file = tarfile.open(MODEL_FILE)
-    # for file in tar_file.getmembers():
-    #     file_name = os.path.basename(file.name)
-    #     if 'frozen_inference_graph.pb' in file_name:
-    #         tar_file.extract(file, os.getcwd())
+    opener = urllib.request.URLopener()
+    opener.retrieve(DOWNLOAD_BASE + MODEL_FILE, MODEL_FILE)
+    tar_file = tarfile.open(MODEL_FILE)
+    for file in tar_file.getmembers():
+        file_name = os.path.basename(file.name)
+        if 'frozen_inference_graph.pb' in file_name:
+            tar_file.extract(file, os.getcwd())
 
     detection_graph = tf.Graph()
     with detection_graph.as_default():
@@ -56,7 +56,7 @@ def get_graph():
 
     return detection_graph
 
-def find_players(xs, name, save=True):
+def find_players(xs, name='', save=True):
     detection_graph = get_graph()
     with detection_graph.as_default():
         with tf.Session(graph=detection_graph) as sess:

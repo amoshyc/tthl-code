@@ -39,7 +39,7 @@ model = Model(inputs=inp, outputs=fuse)
 
 model_arg = {
     'loss': 'binary_crossentropy',
-    'optimizer': 'sgd',
+    'optimizer': SGD(lr=0.001, momentum=0.9),
     'metrics': ['binary_accuracy']
 }
 model.compile(**model_arg)
@@ -54,9 +54,9 @@ fit_arg = {
     'x': x_train,
     'y': y_train,
     'batch_size': 30,
-    'epochs': 100,
+    'epochs': 20,
     'shuffle': True,
     'validation_data': (x_val, y_val),
-    'callbacks': get_callbacks('ens1'),
+    'callbacks': get_callbacks('ens2'),
 }
 model.fit(**fit_arg)
